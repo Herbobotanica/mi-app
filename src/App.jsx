@@ -1,5 +1,21 @@
 import { useState, useEffect } from "react";
 
+import { useState } from "react";
+
+const PASSWORD = "lavanda2026"; // 
+function useAuth() {
+  const [auth, setAuth] = useState(localStorage.getItem("auth") === PASSWORD);
+  const login = (pass) => {
+    if (pass === PASSWORD) {
+      localStorage.setItem("auth", PASSWORD);
+      setAuth(true);
+    } else {
+      alert("Contraseña incorrecta");
+    }
+  };
+  return { auth, login };
+}
+
 const STORAGE_KEY = "herbo_v2"; // same key, migrates data
 const genId = () => Math.random().toString(36).slice(2, 9);
 const fmt = (n, d = 2) => typeof n === "number" ? n.toLocaleString("es-AR", { minimumFractionDigits: d, maximumFractionDigits: d }) : "—";
@@ -1176,7 +1192,16 @@ export default function App() {
   const [sec,setSec]=useState("dashboard");
   const [data,setData]=useState(null);
   const [modal,setModal]=useState(null);
+const { auth, login } = useAuth();
+const [input, setInput] = useState("");
 
+if (!auth) return (
+  <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", height:"100vh" }}>
+    <h2>Acceso restringido</h2>
+    <input type="password" placeholder="Contraseña" value={input} onChange={e => setInput(e.target.value)} />
+    <button onClick={() => login(input)} style={{ marginTop:"10px" }}>Entrar</button>
+  </div>
+);
   useEffect(()=>{
     (async()=>{
       try{
