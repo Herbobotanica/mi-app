@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 
-import { useState } from "react";
-
 const PASSWORD = "lavanda2026"; // 
 function useAuth() {
   const [auth, setAuth] = useState(localStorage.getItem("auth") === PASSWORD);
