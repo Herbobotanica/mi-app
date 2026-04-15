@@ -1322,9 +1322,10 @@ export default function App() {
     {id:"compras",icon:"⊗",label:"Compras",badge:comprasPend||null},
   ];
 
-  const NavItem = ({n,onClick}) => (
-    <button onClick={onClick||()=>{setSec(n.id);setDrawerOpen(false);}} style={{
-      display:"flex",alignItems:"center",gap:10,padding:"10px 16px 10px 18px",
+  const NavItem = ({n, onClick}) => {
+  const handleClick = onClick || (() => { setSec(n.id); setDrawerOpen(false); });
+  return (
+    <button onClick={handleClick} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 16px 10px 18px",
       background:sec===n.id?"rgba(192,206,95,0.15)":"transparent",
       border:"none",borderLeft:sec===n.id?`3px solid ${C.accent}`:"3px solid transparent",
       color:sec===n.id?"#fff":"rgba(255,255,255,.62)",
@@ -1336,6 +1337,7 @@ export default function App() {
       {n.badge?<span style={{background:"#c83020",color:"#fff",borderRadius:10,fontSize:10,padding:"1px 6px",fontFamily:"monospace",fontWeight:700}}>{n.badge}</span>:null}
     </button>
   );
+};
 
   const currentSection = () => {
     switch(sec){
