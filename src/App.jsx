@@ -229,7 +229,6 @@ const MATERIAS_REALES = [
 
 const DEMO = { materias: MATERIAS_REALES, recetas: [], produccion: [], planes: [], compras: [], catalogo: RECETAS_CATALOGO.map(r=>({...r,ingredientes:r.ingredientes.map(i=>({...i}))})) };
 
-// ─── Mobile hook ──────────────────────────────────────────────────────────────
 function useMobile() {
   const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" && window.innerWidth < 768);
   useEffect(() => {
@@ -240,7 +239,6 @@ function useMobile() {
   return isMobile;
 }
 
-// ─── Logo SVG ─────────────────────────────────────────────────────────────────
 function HerboLogo({ width = 100, color = "#ffffff" }) {
   return (
     <svg viewBox="0 0 239.27 78.82" width={width} height={width * (78.82 / 239.27)} fill={color} xmlns="http://www.w3.org/2000/svg">
@@ -253,7 +251,6 @@ function HerboLogo({ width = 100, color = "#ffffff" }) {
   );
 }
 
-// ─── Colors ───────────────────────────────────────────────────────────────────
 const C = {
   bg:"#dedcd0", surface:"#f7f5ee", alt:"#e8e6dc", border:"#cbc8b5",
   sidebar:"#50645f", accent:"#c0ce5f", primary:"#50645f",
@@ -278,6 +275,7 @@ const PRIORIDAD_CFG = {
   atencion:{ label:"Atención", dot:"#d4a017", bg:"#fef9e4", color:"#9a6f00" },
   ok:      { label:"OK",      dot:"#4a6210", bg:"#eef2cc", color:"#4a6210" },
 };
+
 function PrioridadBtn({ valor, onChange }) {
   const cfg = PRIORIDAD_CFG[valor] || PRIORIDAD_CFG.ok;
   const ciclo = { urgente:"atencion", atencion:"ok", ok:"urgente" };
@@ -289,7 +287,6 @@ function PrioridadBtn({ valor, onChange }) {
   );
 }
 
-// ─── Primitives ───────────────────────────────────────────────────────────────
 function Btn({ children, onClick, variant="primary", size="md", disabled, full }) {
   const base = {
     display:"inline-flex", alignItems:"center", gap:6,
@@ -310,12 +307,9 @@ function Btn({ children, onClick, variant="primary", size="md", disabled, full }
 
 function Badge({ text, color="gray" }) {
   const m = {
-    green:{bg:C.successBg,color:C.success},
-    yellow:{bg:C.warningBg,color:C.warning},
-    red:{bg:C.dangerBg,color:C.danger},
-    gray:{bg:C.alt,color:C.muted},
-    terra:{bg:C.terraBg,color:C.terra},
-    info:{bg:C.infoBg,color:C.info},
+    green:{bg:C.successBg,color:C.success}, yellow:{bg:C.warningBg,color:C.warning},
+    red:{bg:C.dangerBg,color:C.danger}, gray:{bg:C.alt,color:C.muted},
+    terra:{bg:C.terraBg,color:C.terra}, info:{bg:C.infoBg,color:C.info},
     lime:{bg:"#eef2cc",color:"#4a6210"},
   };
   const col = m[color] || m.gray;
@@ -383,12 +377,10 @@ function Empty({ icon, text }) {
 const TH = ({children,style:s={}}) => <th style={{padding:"9px 12px",textAlign:"left",fontSize:11,fontWeight:700,textTransform:"uppercase",letterSpacing:.5,color:C.muted,borderBottom:`1.5px solid ${C.border}`,background:C.alt,whiteSpace:"nowrap",...s}}>{children}</th>;
 const TD = ({children,mono,bold,color,style:s={}}) => <td style={{padding:"9px 12px",fontSize:13,fontFamily:mono?"monospace":"inherit",fontWeight:bold?600:400,color:color||C.text,borderBottom:`1px solid ${C.border}`,...s}}>{children}</td>;
 
-// Mobile card wrapper for list items
 function MCard({ children, style: s = {} }) {
   return <div style={{background:C.surface,border:`1.5px solid ${C.border}`,borderRadius:12,padding:"14px 16px",marginBottom:10,...s}}>{children}</div>;
 }
 
-// ─── Price Update Modal ───────────────────────────────────────────────────────
 function PrecioForm({ materia, onSave, onClose }) {
   const [modo,setModo] = useState("pct");
   const [pct,setPct] = useState("");
@@ -431,24 +423,18 @@ function PrecioForm({ materia, onSave, onClose }) {
   );
 }
 
-// ─── Dashboard ────────────────────────────────────────────────────────────────
 function Dashboard({ data, stockValue, lowStock, catalogoMap, setSection }) {
   const { end } = getWeekRange();
-  const planSemana = data.planes.filter(p => {
-    if(p.estado==="producido") return false;
-    return new Date(p.fechaEntrega+"T12:00:00") <= end;
-  }).sort((a,b)=>a.fechaEntrega.localeCompare(b.fechaEntrega));
+  const planSemana = data.planes.filter(p => { if(p.estado==="producido") return false; return new Date(p.fechaEntrega+"T12:00:00") <= end; }).sort((a,b)=>a.fechaEntrega.localeCompare(b.fechaEntrega));
   const comprasPend = data.compras.filter(c=>!c.completado);
   const preciosViejos = data.materias.filter(m=>{const d=diasDesde(m.fechaCosto);return d!==null&&d>60;});
   const recentProd = data.produccion.slice(0,4);
-
   const stats = [
     {label:"Valor del stock",val:fmtARS(stockValue),sub:`${data.materias.length} insumos`,color:C.primary},
     {label:"Por producir",val:data.planes.filter(p=>p.estado!=="producido").length,sub:"items por producir",color:C.info},
     {label:"Stock bajo mínimo",val:lowStock.length,sub:"alertas",color:lowStock.length>0?C.danger:C.success},
     {label:"Precios > 60 días",val:preciosViejos.length,sub:"para revisar",color:preciosViejos.length>0?C.warning:C.success},
   ];
-
   const Widget = ({title,btn,btnAct,children}) => (
     <div style={{background:C.surface,border:`1.5px solid ${C.border}`,borderRadius:12,overflow:"hidden"}}>
       <div style={{padding:"12px 16px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
@@ -458,7 +444,6 @@ function Dashboard({ data, stockValue, lowStock, catalogoMap, setSection }) {
       {children}
     </div>
   );
-
   return (
     <div style={{flex:1,overflow:"auto"}}>
       <PH title="Dashboard" sub={new Date().toLocaleDateString("es-AR",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}/>
@@ -477,45 +462,33 @@ function Dashboard({ data, stockValue, lowStock, catalogoMap, setSection }) {
             {planSemana.length===0?<Empty icon="✓" text="Sin órdenes para esta semana"/>:
               planSemana.map(p=>{
                 const vencido=new Date(p.fechaEntrega+"T12:00:00")<new Date()&&p.estado!=="producido";
-                return(
-                  <div key={p.id} style={{padding:"10px 16px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"center",background:vencido?C.dangerBg:"transparent"}}>
-                    <div>
-                      <div style={{fontSize:13,fontWeight:500}}>{catalogoMap?.[p.recetaId]?.nombre||"—"}</div>
-                      <div style={{fontSize:11,fontFamily:"monospace",color:vencido?C.danger:C.muted}}>Entrega: {fmtF(p.fechaEntrega)} · {p.cantidad} uds</div>
-                    </div>
-                    <EstadoBadge estado={p.estado}/>
-                  </div>
-                );
+                return(<div key={p.id} style={{padding:"10px 16px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"center",background:vencido?C.dangerBg:"transparent"}}>
+                  <div><div style={{fontSize:13,fontWeight:500}}>{catalogoMap?.[p.recetaId]?.nombre||"—"}</div><div style={{fontSize:11,fontFamily:"monospace",color:vencido?C.danger:C.muted}}>Entrega: {fmtF(p.fechaEntrega)} · {p.cantidad} uds</div></div>
+                  <EstadoBadge estado={p.estado}/>
+                </div>);
               })}
           </Widget>
           <Widget title="🛒 Compras pendientes" btn="Ver lista →" btnAct={()=>setSection("compras")}>
             {comprasPend.length===0?<Empty icon="✓" text="Sin compras pendientes"/>:
-              comprasPend.slice(0,5).map(c=>(
-                <div key={c.id} style={{padding:"10px 16px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                  <div><div style={{fontSize:13,fontWeight:500}}>{c.tipo==="auto"?c.materiaId:c.nombre}</div><div style={{fontSize:11,color:C.muted}}>{c.tipo==="auto"?`${fmt(c.cantSugerida,0)} unid`:c.cantidad}</div></div>
-                  <Badge text={c.tipo==="auto"?"stock bajo":"manual"} color={c.tipo==="auto"?"yellow":"gray"}/>
-                </div>
-              ))
-            }
+              comprasPend.slice(0,5).map(c=>(<div key={c.id} style={{padding:"10px 16px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <div><div style={{fontSize:13,fontWeight:500}}>{c.tipo==="auto"?c.materiaId:c.nombre}</div><div style={{fontSize:11,color:C.muted}}>{c.tipo==="auto"?`${fmt(c.cantSugerida,0)} unid`:c.cantidad}</div></div>
+                <Badge text={c.tipo==="auto"?"stock bajo":"manual"} color={c.tipo==="auto"?"yellow":"gray"}/>
+              </div>))}
             {comprasPend.length>5&&<div style={{padding:"8px 16px",fontSize:12,color:C.muted,textAlign:"center"}}>+ {comprasPend.length-5} más</div>}
           </Widget>
           <Widget title="📅 Precios sin actualizar" btn={preciosViejos.length>0?"Ver →":null} btnAct={()=>setSection("materias")}>
             {preciosViejos.length===0?<Empty icon="✓" text="Todos los precios actualizados"/>:
-              preciosViejos.slice(0,4).map(m=>{const d=diasDesde(m.fechaCosto);return(
-                <div key={m.id} style={{padding:"9px 16px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"center",background:d>120?C.dangerBg:C.warningBg}}>
-                  <div><div style={{fontSize:13,fontWeight:500}}>{m.nombre}</div><div style={{fontSize:11,fontFamily:"monospace",color:C.muted}}>{fmtARS(m.precio)} / {m.unidad}</div></div>
-                  <Badge text={`${d}d`} color={d>120?"red":"yellow"}/>
-                </div>
-              );})}
+              preciosViejos.slice(0,4).map(m=>{const d=diasDesde(m.fechaCosto);return(<div key={m.id} style={{padding:"9px 16px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"center",background:d>120?C.dangerBg:C.warningBg}}>
+                <div><div style={{fontSize:13,fontWeight:500}}>{m.nombre}</div><div style={{fontSize:11,fontFamily:"monospace",color:C.muted}}>{fmtARS(m.precio)} / {m.unidad}</div></div>
+                <Badge text={`${d}d`} color={d>120?"red":"yellow"}/>
+              </div>);})}
           </Widget>
           <Widget title="⊙ Producción reciente" btn="Ver todo →" btnAct={()=>setSection("produccion")}>
             {recentProd.length===0?<Empty icon="◎" text="Sin producciones registradas"/>:
-              recentProd.map(p=>{const r=catalogoMap?.[p.recetaId];return(
-                <div key={p.id} style={{padding:"10px 16px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                  <div><div style={{fontSize:13,fontWeight:500}}>{r?.nombre||"—"}</div><div style={{fontSize:11,fontFamily:"monospace",color:C.muted}}>{p.fecha} · {p.operador}</div></div>
-                  <Badge text={`${p.cantidad} uds`} color="lime"/>
-                </div>
-              );})}
+              recentProd.map(p=>{const r=catalogoMap?.[p.recetaId];return(<div key={p.id} style={{padding:"10px 16px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <div><div style={{fontSize:13,fontWeight:500}}>{r?.nombre||"—"}</div><div style={{fontSize:11,fontFamily:"monospace",color:C.muted}}>{p.fecha} · {p.operador}</div></div>
+                <Badge text={`${p.cantidad} uds`} color="lime"/>
+              </div>);})}
           </Widget>
         </div>
       </div>
@@ -523,8 +496,6 @@ function Dashboard({ data, stockValue, lowStock, catalogoMap, setSection }) {
   );
 }
 
-
-// ─── Materias Primas ──────────────────────────────────────────────────────────
 function Materias({ data, handlers, setModal }) {
   const isMobile = useMobile();
   const [search,setSearch] = useState("");
@@ -535,28 +506,24 @@ function Materias({ data, handlers, setModal }) {
   const startEdit = (m,field) => { setEditCell({id:m.id,field}); setEditVal(String(field==="stock"?m.stock:m.stockMin)); };
   const commitEdit = (m) => { if(!editCell)return; const val=parseFloat(editVal); if(!isNaN(val)&&val>=0)handlers.saveMateria({...m,[editCell.field]:val}); setEditCell(null); };
   const onKey = (e,m) => { if(e.key==="Enter")commitEdit(m); if(e.key==="Escape")setEditCell(null); };
-
   const proveedores = [...new Set(data.materias.map(m=>m.proveedor).filter(Boolean))].sort();
   const filtered = data.materias.filter(m=>m.nombre.toLowerCase().includes(search.toLowerCase())&&(!prov||m.proveedor===prov));
   const allSelected = filtered.length>0&&filtered.every(m=>sel.has(m.id));
   const toggleAll = () => { if(allSelected){const s=new Set(sel);filtered.forEach(m=>s.delete(m.id));setSel(s);}else{const s=new Set(sel);filtered.forEach(m=>s.add(m.id));setSel(s);} };
   const toggleOne = id => { const s=new Set(sel); s.has(id)?s.delete(id):s.add(id); setSel(s); };
   const bulkDelete = () => { if(!window.confirm(`¿Eliminar ${sel.size} insumo${sel.size>1?"s":""}?`))return; handlers.delMaterias([...sel]); setSel(new Set()); };
-
   const st = m => {
     if(m.stockMin>0&&m.stock===0) return {label:"Sin stock",color:"red"};
     if(m.stockMin>0&&m.stock<=m.stockMin) return {label:"Bajo",color:"yellow"};
     if(m.stockMin===0) return {label:"—",color:"gray"};
     return {label:"OK",color:"lime"};
   };
-
   const inlineNum = (m, field) => {
     const active = editCell?.id===m.id&&editCell?.field===field;
     const val = field==="stock"?m.stock:m.stockMin;
     if(active) return <input autoFocus type="number" min={0} step={0.1} value={editVal} onChange={e=>setEditVal(e.target.value)} onBlur={()=>commitEdit(m)} onKeyDown={e=>onKey(e,m)} style={{width:"80px",padding:"3px 6px",fontSize:13,fontFamily:"monospace",border:`2px solid ${C.primary}`,borderRadius:5,background:C.white,outline:"none"}}/>;
     return <span onClick={()=>startEdit(m,field)} style={{cursor:"text",fontFamily:"monospace",fontSize:13,display:"inline-flex",alignItems:"center",gap:3}}>{fmt(val,field==="stock"?1:0)}<span style={{fontSize:9,color:C.light}}>✎</span></span>;
   };
-
   return (
     <div style={{flex:1,overflow:"auto",display:"flex",flexDirection:"column"}}>
       <PH title="Materias Primas" sub={`${data.materias.length} insumos · ${filtered.length} visibles`} action={<Btn onClick={()=>setModal({type:"materia",data:null})}>+ Agregar</Btn>}/>
@@ -573,47 +540,24 @@ function Materias({ data, handlers, setModal }) {
         {isMobile ? (
           <div>
             {filtered.map(m=>{
-              const s = st(m);
-              const d = diasDesde(m.fechaCosto);
-              const viejo = d!==null&&d>60;
-              const isSelected = sel.has(m.id);
-              return (
-                <MCard key={m.id} style={{background:isSelected?"#edf0e6":C.surface,borderColor:isSelected?C.primary:C.border}}>
-                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
-                    <div style={{flex:1,marginRight:8}}>
-                      <div style={{fontSize:14,fontWeight:700,color:C.text}}>{m.nombre}</div>
-                      {m.proveedor&&<div style={{fontSize:11,color:C.light}}>{m.proveedor}</div>}
-                    </div>
-                    <div style={{display:"flex",alignItems:"center",gap:8}}>
-                      <input type="checkbox" checked={isSelected} onChange={()=>toggleOne(m.id)} style={{width:16,height:16,accentColor:C.primary}}/>
-                      <Badge text={s.label} color={s.color}/>
-                    </div>
-                  </div>
-                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
-                    <div style={{background:C.alt,borderRadius:8,padding:"8px 10px"}}>
-                      <div style={{fontSize:10,color:C.muted,fontWeight:700,textTransform:"uppercase",marginBottom:3}}>Stock · {m.unidad}</div>
-                      {inlineNum(m,"stock")}
-                    </div>
-                    <div style={{background:C.alt,borderRadius:8,padding:"8px 10px"}}>
-                      <div style={{fontSize:10,color:C.muted,fontWeight:700,textTransform:"uppercase",marginBottom:3}}>Stock mín.</div>
-                      {inlineNum(m,"stockMin")}
-                    </div>
-                    <div style={{background:C.alt,borderRadius:8,padding:"8px 10px"}}>
-                      <div style={{fontSize:10,color:C.muted,fontWeight:700,textTransform:"uppercase",marginBottom:3}}>Precio / {m.unidad}</div>
-                      <div style={{fontSize:13,fontFamily:"monospace",fontWeight:600,color:viejo?C.warning:C.text}}>{fmtARS(m.precio)}{viejo&&<span style={{marginLeft:4}}>⚠</span>}</div>
-                    </div>
-                    <div style={{background:C.terraBg,borderRadius:8,padding:"8px 10px"}}>
-                      <div style={{fontSize:10,color:C.terra,fontWeight:700,textTransform:"uppercase",marginBottom:3}}>Valor total</div>
-                      <div style={{fontSize:13,fontFamily:"monospace",fontWeight:700,color:C.terra}}>{m.stock>0?fmtARS(m.stock*m.precio):"—"}</div>
-                    </div>
-                  </div>
-                  <div style={{display:"flex",gap:8}}>
-                    <Btn size="sm" variant="success" onClick={()=>setModal({type:"precio",data:m})}>$ ↑</Btn>
-                    <Btn size="sm" variant="ghost" onClick={()=>setModal({type:"materia",data:m})}>✎ Editar</Btn>
-                    <Btn size="sm" variant="danger" onClick={()=>{if(window.confirm(`¿Eliminar?`))handlers.delMaterias([m.id]);}}>✕</Btn>
-                  </div>
-                </MCard>
-              );
+              const s=st(m); const d=diasDesde(m.fechaCosto); const viejo=d!==null&&d>60; const isSelected=sel.has(m.id);
+              return (<MCard key={m.id} style={{background:isSelected?"#edf0e6":C.surface,borderColor:isSelected?C.primary:C.border}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
+                  <div style={{flex:1,marginRight:8}}><div style={{fontSize:14,fontWeight:700,color:C.text}}>{m.nombre}</div>{m.proveedor&&<div style={{fontSize:11,color:C.light}}>{m.proveedor}</div>}</div>
+                  <div style={{display:"flex",alignItems:"center",gap:8}}><input type="checkbox" checked={isSelected} onChange={()=>toggleOne(m.id)} style={{width:16,height:16,accentColor:C.primary}}/><Badge text={s.label} color={s.color}/></div>
+                </div>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
+                  <div style={{background:C.alt,borderRadius:8,padding:"8px 10px"}}><div style={{fontSize:10,color:C.muted,fontWeight:700,textTransform:"uppercase",marginBottom:3}}>Stock · {m.unidad}</div>{inlineNum(m,"stock")}</div>
+                  <div style={{background:C.alt,borderRadius:8,padding:"8px 10px"}}><div style={{fontSize:10,color:C.muted,fontWeight:700,textTransform:"uppercase",marginBottom:3}}>Stock mín.</div>{inlineNum(m,"stockMin")}</div>
+                  <div style={{background:C.alt,borderRadius:8,padding:"8px 10px"}}><div style={{fontSize:10,color:C.muted,fontWeight:700,textTransform:"uppercase",marginBottom:3}}>Precio / {m.unidad}</div><div style={{fontSize:13,fontFamily:"monospace",fontWeight:600,color:viejo?C.warning:C.text}}>{fmtARS(m.precio)}{viejo&&<span style={{marginLeft:4}}>⚠</span>}</div></div>
+                  <div style={{background:C.terraBg,borderRadius:8,padding:"8px 10px"}}><div style={{fontSize:10,color:C.terra,fontWeight:700,textTransform:"uppercase",marginBottom:3}}>Valor total</div><div style={{fontSize:13,fontFamily:"monospace",fontWeight:700,color:C.terra}}>{m.stock>0?fmtARS(m.stock*m.precio):"—"}</div></div>
+                </div>
+                <div style={{display:"flex",gap:8}}>
+                  <Btn size="sm" variant="success" onClick={()=>setModal({type:"precio",data:m})}>$ ↑</Btn>
+                  <Btn size="sm" variant="ghost" onClick={()=>setModal({type:"materia",data:m})}>✎ Editar</Btn>
+                  <Btn size="sm" variant="danger" onClick={()=>{if(window.confirm(`¿Eliminar?`))handlers.delMaterias([m.id]);}}>✕</Btn>
+                </div>
+              </MCard>);
             })}
             {filtered.length===0&&<Empty icon="◎" text="No se encontraron insumos"/>}
           </div>
@@ -621,40 +565,21 @@ function Materias({ data, handlers, setModal }) {
           <div style={{background:C.surface,border:`1.5px solid ${C.border}`,borderRadius:12,overflow:"hidden"}}>
             <table style={{width:"100%",borderCollapse:"collapse",tableLayout:"fixed"}}>
               <colgroup><col style={{width:"4%"}}/><col style={{width:"22%"}}/><col style={{width:"7%"}}/><col style={{width:"9%"}}/><col style={{width:"14%"}}/><col style={{width:"9%"}}/><col style={{width:"11%"}}/><col style={{width:"8%"}}/><col style={{width:"16%"}}/></colgroup>
-              <thead>
-                <tr>
-                  <TH><input type="checkbox" checked={allSelected} onChange={toggleAll} style={{width:15,height:15,cursor:"pointer",accentColor:C.primary}}/></TH>
-                  <TH>Insumo / Proveedor</TH><TH>Unidad</TH><TH>Stock ✎</TH><TH>Precio / unid</TH><TH>Mín. ✎</TH><TH>Valor total</TH><TH>Estado</TH><TH></TH>
-                </tr>
-              </thead>
+              <thead><tr><TH><input type="checkbox" checked={allSelected} onChange={toggleAll} style={{width:15,height:15,cursor:"pointer",accentColor:C.primary}}/></TH><TH>Insumo / Proveedor</TH><TH>Unidad</TH><TH>Stock ✎</TH><TH>Precio / unid</TH><TH>Mín. ✎</TH><TH>Valor total</TH><TH>Estado</TH><TH></TH></tr></thead>
               <tbody>
                 {filtered.map((m,i)=>{
                   const s=st(m); const d=diasDesde(m.fechaCosto); const viejo=d!==null&&d>60; const isSelected=sel.has(m.id);
-                  return(
-                    <tr key={m.id} style={{background:isSelected?"#edf0e6":i%2===0?C.surface:C.bg}}>
-                      <TD><input type="checkbox" checked={isSelected} onChange={()=>toggleOne(m.id)} style={{width:15,height:15,cursor:"pointer",accentColor:C.primary}}/></TD>
-                      <TD style={{overflow:"hidden"}}>
-                        <div style={{fontSize:13,fontWeight:600,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{m.nombre}</div>
-                        {m.proveedor&&<div style={{fontSize:11,color:C.light}}>{m.proveedor}</div>}
-                      </TD>
-                      <TD mono color={C.muted}>{m.unidad}</TD>
-                      <TD>{inlineNum(m,"stock")}</TD>
-                      <TD>
-                        <div style={{fontSize:13,fontFamily:"monospace",fontWeight:600,color:viejo?C.warning:C.text}}>{fmtARS(m.precio)}</div>
-                        {m.fechaCosto&&<div style={{fontSize:10,color:viejo?C.warning:C.light}}>{fmtF(m.fechaCosto)}{viejo?" ⚠":""}</div>}
-                      </TD>
-                      <TD>{inlineNum(m,"stockMin")}</TD>
-                      <TD mono bold color={C.terra}>{m.stock>0?fmtARS(m.stock*m.precio):"—"}</TD>
-                      <TD><Badge text={s.label} color={s.color}/></TD>
-                      <TD>
-                        <div style={{display:"flex",gap:4}}>
-                          <Btn size="sm" variant="success" onClick={()=>setModal({type:"precio",data:m})}>$ ↑</Btn>
-                          <Btn size="sm" variant="ghost" onClick={()=>setModal({type:"materia",data:m})}>✎</Btn>
-                          <Btn size="sm" variant="danger" onClick={()=>{if(window.confirm(`¿Eliminar "${m.nombre}"?`))handlers.delMaterias([m.id]);}}>✕</Btn>
-                        </div>
-                      </TD>
-                    </tr>
-                  );
+                  return(<tr key={m.id} style={{background:isSelected?"#edf0e6":i%2===0?C.surface:C.bg}}>
+                    <TD><input type="checkbox" checked={isSelected} onChange={()=>toggleOne(m.id)} style={{width:15,height:15,cursor:"pointer",accentColor:C.primary}}/></TD>
+                    <TD style={{overflow:"hidden"}}><div style={{fontSize:13,fontWeight:600,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{m.nombre}</div>{m.proveedor&&<div style={{fontSize:11,color:C.light}}>{m.proveedor}</div>}</TD>
+                    <TD mono color={C.muted}>{m.unidad}</TD>
+                    <TD>{inlineNum(m,"stock")}</TD>
+                    <TD><div style={{fontSize:13,fontFamily:"monospace",fontWeight:600,color:viejo?C.warning:C.text}}>{fmtARS(m.precio)}</div>{m.fechaCosto&&<div style={{fontSize:10,color:viejo?C.warning:C.light}}>{fmtF(m.fechaCosto)}{viejo?" ⚠":""}</div>}</TD>
+                    <TD>{inlineNum(m,"stockMin")}</TD>
+                    <TD mono bold color={C.terra}>{m.stock>0?fmtARS(m.stock*m.precio):"—"}</TD>
+                    <TD><Badge text={s.label} color={s.color}/></TD>
+                    <TD><div style={{display:"flex",gap:4}}><Btn size="sm" variant="success" onClick={()=>setModal({type:"precio",data:m})}>$ ↑</Btn><Btn size="sm" variant="ghost" onClick={()=>setModal({type:"materia",data:m})}>✎</Btn><Btn size="sm" variant="danger" onClick={()=>{if(window.confirm(`¿Eliminar "${m.nombre}"?`))handlers.delMaterias([m.id]);}}>✕</Btn></div></TD>
+                  </tr>);
                 })}
               </tbody>
             </table>
@@ -666,8 +591,6 @@ function Materias({ data, handlers, setModal }) {
   );
 }
 
-
-// ─── Recetas Catálogo ─────────────────────────────────────────────────────────
 const CAT_COLORS = {Home:{bg:"#e4f0f8",color:"#1a5080"},Humans:{bg:"#eef2cc",color:"#4a6210"},Kids:{bg:"#faf0d8",color:"#8a5a08"},Pets:{bg:"#f7edda",color:"#c5a06e"}};
 const CATS_LIST = ["Home","Humans","Kids","Pets"];
 
@@ -679,15 +602,9 @@ function RecetasCatalogo({ data, handlers }) {
   const [editVal,setEditVal] = useState("");
   const [editText,setEditText] = useState(null);
   const [editTextVal,setEditTextVal] = useState("");
-
   const recetas = data.catalogo || [];
-  const filtered = recetas.filter(r=>{
-    const matchCat=catFiltro==="Todos"||r.categoria===catFiltro;
-    const matchBus=!buscar||r.nombre.toLowerCase().includes(buscar.toLowerCase())||r.sku.toLowerCase().includes(buscar.toLowerCase());
-    return matchCat&&matchBus;
-  });
+  const filtered = recetas.filter(r=>{ const matchCat=catFiltro==="Todos"||r.categoria===catFiltro; const matchBus=!buscar||r.nombre.toLowerCase().includes(buscar.toLowerCase())||r.sku.toLowerCase().includes(buscar.toLowerCase()); return matchCat&&matchBus; });
   const costoReceta = r => r.ingredientes.reduce((s,i)=>s+(i.cantidad*(i.costoUnitario||0)),0);
-
   const updateReceta = (rId, updater) => handlers.saveCatalogo(recetas.map(r=>r.id===rId?updater(r):r));
   const startEdit = (rId,idx,field,val) => { setEditCell({rId,idx,field}); setEditVal(String(val)); setEditText(null); };
   const commitEdit = () => {
@@ -698,16 +615,11 @@ function RecetasCatalogo({ data, handlers }) {
   };
   const onKeyN = e => { if(e.key==="Enter")commitEdit(); if(e.key==="Escape")setEditCell(null); };
   const startEditText = (rId,idx,field,val) => { setEditText({rId,idx,field}); setEditTextVal(val||""); setEditCell(null); };
-  const commitEditText = () => {
-    if(!editText)return;
-    updateReceta(editText.rId,r=>({...r,ingredientes:r.ingredientes.map((ing,i)=>i===editText.idx?{...ing,[editText.field]:editTextVal}:ing)}));
-    setEditText(null);
-  };
+  const commitEditText = () => { if(!editText)return; updateReceta(editText.rId,r=>({...r,ingredientes:r.ingredientes.map((ing,i)=>i===editText.idx?{...ing,[editText.field]:editTextVal}:ing)})); setEditText(null); };
   const onKeyT = e => { if(e.key==="Enter")commitEditText(); if(e.key==="Escape")setEditText(null); };
   const changeCategoria = (rId,cat) => updateReceta(rId,r=>({...r,categoria:cat}));
   const addIng = rId => updateReceta(rId,r=>({...r,ingredientes:[...r.ingredientes,{insumo:"",proveedor:"",unidad:"",cantidad:0,costoUnitario:0,costoTotal:0}]}));
   const delIng = (rId,idx) => updateReceta(rId,r=>{ const ings=r.ingredientes.filter((_,i)=>i!==idx); return{...r,ingredientes:ings,costoTotal:+ings.reduce((s,i)=>s+i.costoTotal,0).toFixed(2)}; });
-
   const numCell = (rId,idx,field,val) => {
     const active=editCell?.rId===rId&&editCell?.idx===idx&&editCell?.field===field;
     if(active)return <input autoFocus type="number" min={0} step={0.01} value={editVal} onChange={e=>setEditVal(e.target.value)} onBlur={commitEdit} onKeyDown={onKeyN} style={{width:80,padding:"2px 5px",fontSize:12,fontFamily:"monospace",border:`2px solid ${C.primary}`,borderRadius:4,background:C.white,outline:"none"}}/>;
@@ -718,7 +630,6 @@ function RecetasCatalogo({ data, handlers }) {
     if(active)return <input autoFocus value={editTextVal} onChange={e=>setEditTextVal(e.target.value)} onBlur={commitEditText} onKeyDown={onKeyT} placeholder={ph} style={{width:"100%",padding:"2px 5px",fontSize:12,border:`2px solid ${C.primary}`,borderRadius:4,background:C.white,outline:"none",fontFamily:"inherit"}}/>;
     return <span onClick={()=>startEditText(rId,idx,field,val)} style={{cursor:"text",fontSize:12,display:"inline-flex",alignItems:"center",gap:3,color:val?C.text:C.light}}>{val||ph}<span style={{fontSize:9,color:C.light,marginLeft:2}}>✎</span></span>;
   };
-
   return (
     <div style={{flex:1,overflow:"auto",display:"flex",flexDirection:"column"}}>
       <PH title="Recetas & Fichas" sub={`${recetas.length} productos · ${filtered.length} visibles`}/>
@@ -732,25 +643,19 @@ function RecetasCatalogo({ data, handlers }) {
         {filtered.length===0?<Empty icon="⊕" text="No se encontraron productos"/>:(
           <div style={{display:"flex",flexDirection:"column",gap:10}}>
             {filtered.map(r=>{
-              const isOpen=open===r.id;
-              const costo=costoReceta(r);
-              const catCfg=CAT_COLORS[r.categoria]||{bg:C.alt,color:C.muted};
+              const isOpen=open===r.id; const costo=costoReceta(r); const catCfg=CAT_COLORS[r.categoria]||{bg:C.alt,color:C.muted};
               return(
                 <div key={r.id} style={{background:C.surface,border:`1.5px solid ${C.border}`,borderRadius:12,overflow:"hidden"}}>
-                  <div style={{padding:"12px 16px",display:"flex",alignItems:"center",gap:10,justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
+                  <div style={{padding:"12px 16px",display:"flex",alignItems:"center",gap:10,justifyContent:"space-between",flexWrap:"wrap"}}>
                     <div style={{flex:1,minWidth:0,cursor:"pointer"}} onClick={()=>setOpen(isOpen?null:r.id)}>
                       <div style={{fontSize:14,fontWeight:700,color:C.text,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{r.nombre}</div>
                       <div style={{fontSize:11,fontFamily:"monospace",color:C.light,marginTop:1}}>SKU: {r.sku}</div>
                     </div>
                     <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
-                      <select value={r.categoria} onChange={e=>{e.stopPropagation();changeCategoria(r.id,e.target.value);}} onClick={e=>e.stopPropagation()}
-                        style={{padding:"4px 8px",fontSize:11,fontFamily:"monospace",fontWeight:700,border:`1.5px solid ${C.border}`,borderRadius:6,cursor:"pointer",background:catCfg.bg,color:catCfg.color,outline:"none"}}>
+                      <select value={r.categoria} onChange={e=>{e.stopPropagation();changeCategoria(r.id,e.target.value);}} onClick={e=>e.stopPropagation()} style={{padding:"4px 8px",fontSize:11,fontFamily:"monospace",fontWeight:700,border:`1.5px solid ${C.border}`,borderRadius:6,cursor:"pointer",background:catCfg.bg,color:catCfg.color,outline:"none"}}>
                         {CATS_LIST.map(c=><option key={c} value={c}>{c}</option>)}
                       </select>
-                      <div style={{textAlign:"right"}}>
-                        <div style={{fontSize:10,color:C.muted}}>Costo</div>
-                        <div style={{fontSize:14,fontWeight:800,color:C.terra,fontFamily:"monospace"}}>{fmtARS(costo)}</div>
-                      </div>
+                      <div style={{textAlign:"right"}}><div style={{fontSize:10,color:C.muted}}>Costo</div><div style={{fontSize:14,fontWeight:800,color:C.terra,fontFamily:"monospace"}}>{fmtARS(costo)}</div></div>
                       <span style={{fontSize:14,color:C.light,cursor:"pointer"}} onClick={()=>setOpen(isOpen?null:r.id)}>{isOpen?"▲":"▼"}</span>
                     </div>
                   </div>
@@ -794,8 +699,6 @@ function RecetasCatalogo({ data, handlers }) {
   );
 }
 
-
-// ─── Plan de Producción ───────────────────────────────────────────────────────
 function PlanProduccion({ data, handlers, setModal }) {
   const isMobile = useMobile();
   const [filtroEstado,setFiltroEstado] = useState("activos");
@@ -803,7 +706,6 @@ function PlanProduccion({ data, handlers, setModal }) {
   const getNombre = id => cMap[id]?.nombre||"Producto eliminado";
   const filtered = data.planes.filter(p=>{ if(filtroEstado==="activos")return p.estado!=="producido"; if(filtroEstado==="producido")return p.estado==="producido"; return true; }).sort((a,b)=>a.fechaEntrega.localeCompare(b.fechaEntrega));
   const hoy = new Date(); hoy.setHours(0,0,0,0);
-
   return (
     <div style={{flex:1,overflow:"auto",display:"flex",flexDirection:"column"}}>
       <PH title="Plan de Producción" sub={`${data.planes.filter(p=>p.estado!=="producido").length} órdenes activas`}
@@ -817,33 +719,25 @@ function PlanProduccion({ data, handlers, setModal }) {
         {isMobile ? (
           <div>
             {filtered.map(p=>{
-              const d = new Date(p.fechaEntrega+"T12:00:00");
-              const vencido = d<hoy&&p.estado!=="producido";
-              return (
-                <MCard key={p.id} style={{background:vencido?C.dangerBg:C.surface}}>
-                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}>
-                    <div style={{flex:1,marginRight:8}}>
-                      <div style={{fontSize:14,fontWeight:700,color:C.text}}>{getNombre(p.recetaId)}</div>
-                      <div style={{fontSize:12,fontFamily:"monospace",color:vencido?C.danger:C.muted,marginTop:2}}>
-                        Entrega: {fmtF(p.fechaEntrega)}{vencido?" — Vencida":""}
-                      </div>
-                    </div>
-                    <EstadoBadge estado={p.estado}/>
-                  </div>
-                  <div style={{marginBottom:10}}><PrioridadBtn valor={p.prioridad||"ok"} onChange={v=>handlers.savePlan({...p,prioridad:v})}/></div>
-                  <div style={{display:"flex",gap:8,marginBottom:10,flexWrap:"wrap"}}>
-                    <div style={{background:C.alt,borderRadius:8,padding:"6px 10px",fontSize:12}}><span style={{color:C.muted}}>Cantidad: </span><strong>{p.cantidad} uds</strong></div>
-                    {p.totalProducido>0&&<div style={{background:C.successBg,borderRadius:8,padding:"6px 10px",fontSize:12,color:C.success}}><strong>Producido: {p.totalProducido} uds</strong></div>}
-                  </div>
-                  {p.notas&&<div style={{fontSize:12,color:C.muted,marginBottom:10,fontStyle:"italic"}}>{p.notas}</div>}
-                  <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
-                    {p.estado==="por_hacer"&&<Btn size="sm" variant="info" onClick={()=>handlers.updatePlanEstado(p.id,"en_proceso",{})}>▶ En proceso</Btn>}
-                    {p.estado==="en_proceso"&&<Btn size="sm" variant="success" onClick={()=>setModal({type:"producido",plan:p})}>✓ Producido</Btn>}
-                    {p.estado!=="producido"&&<Btn size="sm" variant="ghost" onClick={()=>setModal({type:"plan",data:p})}>✎ Editar</Btn>}
-                    <Btn size="sm" variant="danger" onClick={()=>{if(window.confirm("¿Eliminar?"))handlers.delPlan(p.id);}}>✕</Btn>
-                  </div>
-                </MCard>
-              );
+              const d=new Date(p.fechaEntrega+"T12:00:00"); const vencido=d<hoy&&p.estado!=="producido";
+              return (<MCard key={p.id} style={{background:vencido?C.dangerBg:C.surface}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}>
+                  <div style={{flex:1,marginRight:8}}><div style={{fontSize:14,fontWeight:700,color:C.text}}>{getNombre(p.recetaId)}</div><div style={{fontSize:12,fontFamily:"monospace",color:vencido?C.danger:C.muted,marginTop:2}}>Entrega: {fmtF(p.fechaEntrega)}{vencido?" — Vencida":""}</div></div>
+                  <EstadoBadge estado={p.estado}/>
+                </div>
+                <div style={{marginBottom:10}}><PrioridadBtn valor={p.prioridad||"ok"} onChange={v=>handlers.savePlan({...p,prioridad:v})}/></div>
+                <div style={{display:"flex",gap:8,marginBottom:10,flexWrap:"wrap"}}>
+                  <div style={{background:C.alt,borderRadius:8,padding:"6px 10px",fontSize:12}}><span style={{color:C.muted}}>Cantidad: </span><strong>{p.cantidad} uds</strong></div>
+                  {p.totalProducido>0&&<div style={{background:C.successBg,borderRadius:8,padding:"6px 10px",fontSize:12,color:C.success}}><strong>Producido: {p.totalProducido} uds</strong></div>}
+                </div>
+                {p.notas&&<div style={{fontSize:12,color:C.muted,marginBottom:10,fontStyle:"italic"}}>{p.notas}</div>}
+                <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+                  {p.estado==="por_hacer"&&<Btn size="sm" variant="info" onClick={()=>handlers.updatePlanEstado(p.id,"en_proceso",{})}>▶ En proceso</Btn>}
+                  {p.estado==="en_proceso"&&<Btn size="sm" variant="success" onClick={()=>setModal({type:"producido",plan:p})}>✓ Producido</Btn>}
+                  {p.estado!=="producido"&&<Btn size="sm" variant="ghost" onClick={()=>setModal({type:"plan",data:p})}>✎ Editar</Btn>}
+                  <Btn size="sm" variant="danger" onClick={()=>{if(window.confirm("¿Eliminar?"))handlers.delPlan(p.id);}}>✕</Btn>
+                </div>
+              </MCard>);
             })}
             {filtered.length===0&&<Empty icon="📋" text="No hay órdenes en este estado"/>}
           </div>
@@ -854,25 +748,23 @@ function PlanProduccion({ data, handlers, setModal }) {
               <tbody>
                 {filtered.map((p,i)=>{
                   const d=new Date(p.fechaEntrega+"T12:00:00"); const vencido=d<hoy&&p.estado!=="producido";
-                  return(
-                    <tr key={p.id} style={{background:vencido?C.dangerBg:i%2===0?C.surface:C.bg}}>
-                      <TD bold>{getNombre(p.recetaId)}</TD>
-                      <TD><PrioridadBtn valor={p.prioridad||"ok"} onChange={v=>handlers.savePlan({...p,prioridad:v})}/></TD>
-                      <TD mono color={C.muted}>{p.cantidad} uds</TD>
-                      <TD><div style={{fontSize:13,fontFamily:"monospace",color:vencido?C.danger:C.text,fontWeight:vencido?700:400}}>{fmtF(p.fechaEntrega)}</div>{vencido&&<div style={{fontSize:10,color:C.danger}}>Vencida</div>}</TD>
-                      <TD mono color={p.totalProducido>0?C.success:C.light}>{p.totalProducido>0?`${p.totalProducido} uds`:"—"}</TD>
-                      <TD><EstadoBadge estado={p.estado}/></TD>
-                      <TD color={C.muted} style={{maxWidth:160,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.notas||"—"}</TD>
-                      <TD>
-                        <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
-                          {p.estado==="por_hacer"&&<Btn size="sm" variant="info" onClick={()=>handlers.updatePlanEstado(p.id,"en_proceso",{})}>▶ En proceso</Btn>}
-                          {p.estado==="en_proceso"&&<Btn size="sm" variant="success" onClick={()=>setModal({type:"producido",plan:p})}>✓ Producido</Btn>}
-                          {p.estado!=="producido"&&<Btn size="sm" variant="ghost" onClick={()=>setModal({type:"plan",data:p})}>✎</Btn>}
-                          <Btn size="sm" variant="danger" onClick={()=>{if(window.confirm("¿Eliminar?"))handlers.delPlan(p.id);}}>✕</Btn>
-                        </div>
-                      </TD>
-                    </tr>
-                  );
+                  return(<tr key={p.id} style={{background:vencido?C.dangerBg:i%2===0?C.surface:C.bg}}>
+                    <TD bold>{getNombre(p.recetaId)}</TD>
+                    <TD><PrioridadBtn valor={p.prioridad||"ok"} onChange={v=>handlers.savePlan({...p,prioridad:v})}/></TD>
+                    <TD mono color={C.muted}>{p.cantidad} uds</TD>
+                    <TD><div style={{fontSize:13,fontFamily:"monospace",color:vencido?C.danger:C.text,fontWeight:vencido?700:400}}>{fmtF(p.fechaEntrega)}</div>{vencido&&<div style={{fontSize:10,color:C.danger}}>Vencida</div>}</TD>
+                    <TD mono color={p.totalProducido>0?C.success:C.light}>{p.totalProducido>0?`${p.totalProducido} uds`:"—"}</TD>
+                    <TD><EstadoBadge estado={p.estado}/></TD>
+                    <TD color={C.muted} style={{maxWidth:160,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.notas||"—"}</TD>
+                    <TD>
+                      <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
+                        {p.estado==="por_hacer"&&<Btn size="sm" variant="info" onClick={()=>handlers.updatePlanEstado(p.id,"en_proceso",{})}>▶ En proceso</Btn>}
+                        {p.estado==="en_proceso"&&<Btn size="sm" variant="success" onClick={()=>setModal({type:"producido",plan:p})}>✓ Producido</Btn>}
+                        {p.estado!=="producido"&&<Btn size="sm" variant="ghost" onClick={()=>setModal({type:"plan",data:p})}>✎</Btn>}
+                        <Btn size="sm" variant="danger" onClick={()=>{if(window.confirm("¿Eliminar?"))handlers.delPlan(p.id);}}>✕</Btn>
+                      </div>
+                    </TD>
+                  </tr>);
                 })}
               </tbody>
             </table>
@@ -887,7 +779,6 @@ function PlanProduccion({ data, handlers, setModal }) {
   );
 }
 
-// ─── Calculador ───────────────────────────────────────────────────────────────
 function Calculador({ data, setModal }) {
   const catalogo = data.catalogo || [];
   const [rId,setRId] = useState(catalogo[0]?.id||"");
@@ -897,7 +788,6 @@ function Calculador({ data, setModal }) {
   const calc = receta ? receta.ingredientes.map(ing=>{ const m=mByNombre[ing.insumo?.toLowerCase().trim()]; const nec=ing.cantidad*qty; const disp=m?.stock||0; return{nombre:ing.insumo,unidad:ing.unidad,materia:m,necesario:nec,disponible:disp,deficit:disp-nec}; }) : [];
   const ok = calc.length>0&&calc.every(r=>r.deficit>=0);
   const cost = receta ? receta.ingredientes.reduce((s,ing)=>s+(ing.cantidad*(ing.costoUnitario||0)*qty),0) : 0;
-
   return (
     <div style={{flex:1,overflow:"auto",display:"flex",flexDirection:"column"}}>
       <PH title="Calculador" sub="Verificá materiales antes de producir"/>
@@ -906,50 +796,39 @@ function Calculador({ data, setModal }) {
           <Field label="Producto" required>
             <select value={rId} onChange={e=>setRId(e.target.value)} style={{...iSt,cursor:"pointer"}}>
               <option value="">— seleccionar —</option>
-              {CATS_LIST.map(cat=>(
-                <optgroup key={cat} label={cat}>
-                  {catalogo.filter(r=>r.categoria===cat).map(r=><option key={r.id} value={r.id}>{r.nombre}</option>)}
-                </optgroup>
-              ))}
+              {CATS_LIST.map(cat=>(<optgroup key={cat} label={cat}>{catalogo.filter(r=>r.categoria===cat).map(r=><option key={r.id} value={r.id}>{r.nombre}</option>)}</optgroup>))}
             </select>
           </Field>
           <NI label="Cantidad a producir (unidades)" required value={qty} min={1} onChange={e=>setQty(Number(e.target.value))}/>
-          {receta&&(
-            <div style={{padding:"12px",background:ok?C.successBg:C.dangerBg,borderRadius:10,marginBottom:14}}>
-              <div style={{fontSize:13,fontWeight:700,color:ok?C.success:C.danger,marginBottom:4}}>{ok?"✓ Stock suficiente":"✗ Stock insuficiente"}</div>
-              <div style={{fontSize:12,color:C.muted}}>Costo total: {fmtARS(cost)}</div>
-              <div style={{fontSize:12,color:C.muted}}>Por unidad: {fmtARS(cost/qty)}</div>
-            </div>
-          )}
+          {receta&&(<div style={{padding:"12px",background:ok?C.successBg:C.dangerBg,borderRadius:10,marginBottom:14}}>
+            <div style={{fontSize:13,fontWeight:700,color:ok?C.success:C.danger,marginBottom:4}}>{ok?"✓ Stock suficiente":"✗ Stock insuficiente"}</div>
+            <div style={{fontSize:12,color:C.muted}}>Costo total: {fmtARS(cost)}</div>
+            <div style={{fontSize:12,color:C.muted}}>Por unidad: {fmtARS(cost/qty)}</div>
+          </div>)}
           {receta&&<Btn full onClick={()=>setModal({type:"produccionCat",recetaId:rId,cantidad:qty})} disabled={!ok}>⊙ Registrar producción</Btn>}
         </div>
-        {receta&&(
-          <div style={{background:C.surface,border:`1.5px solid ${C.border}`,borderRadius:12,overflow:"hidden"}}>
-            <div style={{padding:"12px 16px",borderBottom:`1px solid ${C.border}`,fontWeight:700,fontSize:14}}>{receta.nombre} · {qty} unidades</div>
-            <div style={{overflowX:"auto"}}>
-              <table style={{width:"100%",borderCollapse:"collapse",minWidth:400}}>
-                <thead><tr><TH>Ingrediente</TH><TH>Necesario</TH><TH>En stock</TH><TH>Diferencia</TH><TH>Estado</TH></tr></thead>
-                <tbody>{calc.map((row,i)=>{ const o=row.deficit>=0; return(
-                  <tr key={i} style={{background:o?(i%2===0?C.surface:C.bg):C.dangerBg}}>
-                    <TD bold style={{fontSize:13}}>{row.nombre}</TD>
-                    <TD mono color={C.muted}>{fmt(row.necesario,2)} {row.unidad}</TD>
-                    <TD mono bold color={o?C.success:C.danger}>{row.materia?fmt(row.disponible,2):"—"}{!row.materia&&<span style={{fontSize:10,color:C.warning,marginLeft:4}}>sin materia</span>}</TD>
-                    <TD mono bold color={o?C.success:C.danger}>{row.materia?(o?"+":"")+fmt(row.deficit,2):"—"}</TD>
-                    <TD><Badge text={!row.materia?"Sin materia":o?"OK":"Falta"} color={!row.materia?"yellow":o?"lime":"red"}/></TD>
-                  </tr>
-                );})}
-                </tbody>
-              </table>
-            </div>
+        {receta&&(<div style={{background:C.surface,border:`1.5px solid ${C.border}`,borderRadius:12,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px",borderBottom:`1px solid ${C.border}`,fontWeight:700,fontSize:14}}>{receta.nombre} · {qty} unidades</div>
+          <div style={{overflowX:"auto"}}>
+            <table style={{width:"100%",borderCollapse:"collapse",minWidth:400}}>
+              <thead><tr><TH>Ingrediente</TH><TH>Necesario</TH><TH>En stock</TH><TH>Diferencia</TH><TH>Estado</TH></tr></thead>
+              <tbody>{calc.map((row,i)=>{ const o=row.deficit>=0; return(<tr key={i} style={{background:o?(i%2===0?C.surface:C.bg):C.dangerBg}}>
+                <TD bold style={{fontSize:13}}>{row.nombre}</TD>
+                <TD mono color={C.muted}>{fmt(row.necesario,2)} {row.unidad}</TD>
+                <TD mono bold color={o?C.success:C.danger}>{row.materia?fmt(row.disponible,2):"—"}{!row.materia&&<span style={{fontSize:10,color:C.warning,marginLeft:4}}>sin materia</span>}</TD>
+                <TD mono bold color={o?C.success:C.danger}>{row.materia?(o?"+":"")+fmt(row.deficit,2):"—"}</TD>
+                <TD><Badge text={!row.materia?"Sin materia":o?"OK":"Falta"} color={!row.materia?"yellow":o?"lime":"red"}/></TD>
+              </tr>);})}
+              </tbody>
+            </table>
           </div>
-        )}
+        </div>)}
         {!receta&&<Empty icon="⊘" text="Seleccioná un producto para calcular"/>}
       </div>
     </div>
   );
 }
 
-// ─── Control de Producción ────────────────────────────────────────────────────
 function Produccion({ data, catalogoMap, handlers, setModal }) {
   const isMobile = useMobile();
   const [filter,setFilter] = useState("");
@@ -961,32 +840,27 @@ function Produccion({ data, catalogoMap, handlers, setModal }) {
       <div style={{padding:"0 16px 16px"}}>
         {isMobile ? (
           <div>
-            {filtered.map(p=>{ const r=catalogoMap?.[p.recetaId]; return(
-              <MCard key={p.id}>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
-                  <div><div style={{fontSize:14,fontWeight:700}}>{r?.nombre||"—"}</div><div style={{fontSize:11,fontFamily:"monospace",color:C.muted}}>{p.fecha} · {p.operador}</div></div>
-                  <Badge text={`${p.cantidad} uds`} color="lime"/>
-                </div>
-                {p.notas&&<div style={{fontSize:12,color:C.muted,fontStyle:"italic",marginBottom:8}}>{p.notas}</div>}
-                <Btn size="sm" variant="danger" onClick={()=>{if(window.confirm("¿Eliminar?"))handlers.delProduccion(p.id);}}>✕ Eliminar</Btn>
-              </MCard>
-            );})}
+            {filtered.map(p=>{ const r=catalogoMap?.[p.recetaId]; return(<MCard key={p.id}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
+                <div><div style={{fontSize:14,fontWeight:700}}>{r?.nombre||"—"}</div><div style={{fontSize:11,fontFamily:"monospace",color:C.muted}}>{p.fecha} · {p.operador}</div></div>
+                <Badge text={`${p.cantidad} uds`} color="lime"/>
+              </div>
+              {p.notas&&<div style={{fontSize:12,color:C.muted,fontStyle:"italic",marginBottom:8}}>{p.notas}</div>}
+              <Btn size="sm" variant="danger" onClick={()=>{if(window.confirm("¿Eliminar?"))handlers.delProduccion(p.id);}}>✕ Eliminar</Btn>
+            </MCard>);})}
             {filtered.length===0&&<Empty icon="◎" text="No hay lotes registrados"/>}
           </div>
         ) : (
           <div style={{background:C.surface,border:`1.5px solid ${C.border}`,borderRadius:12,overflow:"hidden"}}>
             <table style={{width:"100%",borderCollapse:"collapse"}}>
               <thead><tr><TH>Fecha</TH><TH>Producto</TH><TH>Cantidad</TH><TH>Operador</TH><TH>Notas</TH><TH></TH></tr></thead>
-              <tbody>{filtered.map((p,i)=>{ const r=catalogoMap?.[p.recetaId]; return(
-                <tr key={p.id} style={{background:i%2===0?C.surface:C.bg}}>
-                  <TD mono color={C.muted}>{p.fecha}</TD>
-                  <TD bold>{r?.nombre||"—"}</TD>
-                  <TD><Badge text={`${p.cantidad} uds`} color="lime"/></TD>
-                  <TD color={C.muted}>{p.operador}</TD>
-                  <TD color={C.muted} style={{maxWidth:200,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.notas||"—"}</TD>
-                  <TD><Btn size="sm" variant="danger" onClick={()=>{if(window.confirm("¿Eliminar?"))handlers.delProduccion(p.id);}}>✕</Btn></TD>
-                </tr>
-              );})}
+              <tbody>{filtered.map((p,i)=>{ const r=catalogoMap?.[p.recetaId]; return(<tr key={p.id} style={{background:i%2===0?C.surface:C.bg}}>
+                <TD mono color={C.muted}>{p.fecha}</TD><TD bold>{r?.nombre||"—"}</TD>
+                <TD><Badge text={`${p.cantidad} uds`} color="lime"/></TD>
+                <TD color={C.muted}>{p.operador}</TD>
+                <TD color={C.muted} style={{maxWidth:200,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.notas||"—"}</TD>
+                <TD><Btn size="sm" variant="danger" onClick={()=>{if(window.confirm("¿Eliminar?"))handlers.delProduccion(p.id);}}>✕</Btn></TD>
+              </tr>);})}
               </tbody>
             </table>
             {filtered.length===0&&<Empty icon="◎" text="No hay lotes registrados"/>}
@@ -997,7 +871,6 @@ function Produccion({ data, catalogoMap, handlers, setModal }) {
   );
 }
 
-// ─── Compras ──────────────────────────────────────────────────────────────────
 function Compras({ data, materiasMap, lowStock, handlers, setModal }) {
   const pend=data.compras.filter(c=>!c.completado), comp=data.compras.filter(c=>c.completado);
   const auto=pend.filter(c=>c.tipo==="auto"), manual=pend.filter(c=>c.tipo==="manual");
@@ -1029,13 +902,11 @@ function Compras({ data, materiasMap, lowStock, handlers, setModal }) {
         {comp.length>0&&<div style={{opacity:.6}}>
           <div style={{fontSize:11,fontWeight:700,textTransform:"uppercase",letterSpacing:.5,color:C.light,marginBottom:8}}>✓ Completadas ({comp.length})</div>
           <div style={{background:C.surface,border:`1.5px solid ${C.border}`,borderRadius:12,overflow:"hidden"}}>
-            {comp.map(c=>{ const m=c.tipo==="auto"?materiasMap[c.materiaId]:null; return(
-              <div key={c.id} style={{padding:"9px 16px",borderBottom:`1px solid ${C.border}`,display:"flex",alignItems:"center",gap:12,textDecoration:"line-through"}}>
-                <input type="checkbox" checked onChange={()=>handlers.toggleCompra(c.id)} style={{width:16,height:16,cursor:"pointer",accentColor:C.primary}}/>
-                <span style={{fontSize:13,color:C.muted,flex:1}}>{m?m.nombre:c.nombre}</span>
-                <Btn size="sm" variant="ghost" onClick={()=>handlers.delCompra(c.id)}>✕</Btn>
-              </div>
-            );})}
+            {comp.map(c=>{ const m=c.tipo==="auto"?materiasMap[c.materiaId]:null; return(<div key={c.id} style={{padding:"9px 16px",borderBottom:`1px solid ${C.border}`,display:"flex",alignItems:"center",gap:12,textDecoration:"line-through"}}>
+              <input type="checkbox" checked onChange={()=>handlers.toggleCompra(c.id)} style={{width:16,height:16,cursor:"pointer",accentColor:C.primary}}/>
+              <span style={{fontSize:13,color:C.muted,flex:1}}>{m?m.nombre:c.nombre}</span>
+              <Btn size="sm" variant="ghost" onClick={()=>handlers.delCompra(c.id)}>✕</Btn>
+            </div>);})}
           </div>
         </div>}
       </div>
@@ -1043,8 +914,6 @@ function Compras({ data, materiasMap, lowStock, handlers, setModal }) {
   );
 }
 
-
-// ─── Forms ────────────────────────────────────────────────────────────────────
 function MateriaForm({ item, onSave, onClose }) {
   const [f,setF]=useState(item||{nombre:"",proveedor:"",unidad:"ml",stock:0,precio:0,stockMin:0,fechaCosto:todayStr()});
   const s=(k,v)=>setF(p=>({...p,[k]:v}));
@@ -1076,11 +945,7 @@ function PlanForm({ item, catalogo, onSave, onClose }) {
     <Field label="Producto" required>
       <select value={f.recetaId} onChange={e=>s("recetaId",e.target.value)} style={{...iSt,cursor:"pointer"}}>
         <option value="">— seleccionar —</option>
-        {CATS_LIST.map(cat=>(
-          <optgroup key={cat} label={cat}>
-            {catalogo.filter(r=>r.categoria===cat).map(r=><option key={r.id} value={r.id}>{r.nombre}</option>)}
-          </optgroup>
-        ))}
+        {CATS_LIST.map(cat=>(<optgroup key={cat} label={cat}>{catalogo.filter(r=>r.categoria===cat).map(r=><option key={r.id} value={r.id}>{r.nombre}</option>)}</optgroup>))}
       </select>
     </Field>
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
@@ -1092,8 +957,7 @@ function PlanForm({ item, catalogo, onSave, onClose }) {
       <div style={{display:"flex",gap:8}}>
         {Object.entries(PRIORIDAD_CFG).map(([k,cfg])=>(
           <button key={k} onClick={()=>s("prioridad",k)} style={{flex:1,padding:"8px",border:`2px solid ${f.prioridad===k?cfg.dot:C.border}`,borderRadius:8,cursor:"pointer",background:f.prioridad===k?cfg.bg:C.surface,fontFamily:"inherit",fontSize:13,fontWeight:f.prioridad===k?700:400,color:f.prioridad===k?cfg.color:C.muted,display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
-            <span style={{width:9,height:9,borderRadius:"50%",background:cfg.dot,flexShrink:0}}/>
-            {cfg.label}
+            <span style={{width:9,height:9,borderRadius:"50%",background:cfg.dot,flexShrink:0}}/>{cfg.label}
           </button>
         ))}
       </div>
@@ -1170,9 +1034,7 @@ function CSVPlanForm({ catalogo, onSave, onClose }) {
   };
   const okRows=preview.filter(r=>r.ok).length;
   return(<Modal title="Importar Plan desde CSV" onClose={onClose} width={580}>
-    <div style={{marginBottom:12,padding:"10px 12px",background:C.infoBg,borderRadius:8,fontSize:12,color:C.info}}>
-      Formato: <code style={{fontFamily:"monospace"}}>producto,cantidad,fecha_entrega,notas</code>
-    </div>
+    <div style={{marginBottom:12,padding:"10px 12px",background:C.infoBg,borderRadius:8,fontSize:12,color:C.info}}>Formato: <code style={{fontFamily:"monospace"}}>producto,cantidad,fecha_entrega,notas</code></div>
     <Field label="Pegá el contenido del CSV">
       <textarea value={csvText} onChange={e=>{setCsvText(e.target.value);parseCSV(e.target.value);}} style={{...iSt,fontFamily:"monospace",fontSize:12,minHeight:100,resize:"vertical"}} placeholder={"Bruma Aroma Sagrado,30,2026-04-20,Lote primavera"}/>
     </Field>
@@ -1180,11 +1042,9 @@ function CSVPlanForm({ catalogo, onSave, onClose }) {
     {preview.length>0&&<div style={{marginBottom:14}}>
       <div style={{fontSize:12,fontWeight:700,color:C.muted,marginBottom:6}}>{okRows} de {preview.length} filas válidas</div>
       <div style={{background:C.surface,border:`1px solid ${C.border}`,borderRadius:8,overflow:"hidden",maxHeight:180,overflowY:"auto"}}>
-        {preview.map((r,i)=>(
-          <div key={i} style={{padding:"7px 12px",borderBottom:`1px solid ${C.border}`,display:"flex",gap:10,alignItems:"center",background:r.ok?C.surface:C.dangerBg}}>
-            <span>{r.ok?"✓":"✗"}</span><span style={{flex:1,fontSize:12}}>{r.nombre}</span><span style={{fontSize:12,fontFamily:"monospace",color:C.muted}}>{r.qty} uds · {r.fecha}</span>
-          </div>
-        ))}
+        {preview.map((r,i)=>(<div key={i} style={{padding:"7px 12px",borderBottom:`1px solid ${C.border}`,display:"flex",gap:10,alignItems:"center",background:r.ok?C.surface:C.dangerBg}}>
+          <span>{r.ok?"✓":"✗"}</span><span style={{flex:1,fontSize:12}}>{r.nombre}</span><span style={{fontSize:12,fontFamily:"monospace",color:C.muted}}>{r.qty} uds · {r.fecha}</span>
+        </div>))}
       </div>
     </div>}
     <div style={{display:"flex",gap:8,justifyContent:"flex-end"}}>
@@ -1208,13 +1068,20 @@ function CompraManualForm({ onSave, onClose }) {
   </Modal>);
 }
 
-
-// ─── App ──────────────────────────────────────────────────────────────────────
+// ─── App — FIX: todos los hooks ANTES de cualquier return ─────────────────────
 export default function App() {
   const isMobile = useMobile();
+
+  // ── Auth state ──
   const [authed, setAuthed] = useState(() => sessionStorage.getItem("herbo_auth") === "1");
   const [pass, setPass] = useState("");
   const [error, setError] = useState(false);
+
+  // ── App state (hooks siempre se ejecutan, sin importar authed) ──
+  const [sec, setSec] = useState("dashboard");
+  const [data, setData] = useState(null);
+  const [modal, setModal] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const handleLogin = () => {
     if (pass === "lavanda2026") {
@@ -1227,6 +1094,29 @@ export default function App() {
     }
   };
 
+  // ── Carga de datos: espera a que el usuario esté autenticado ──
+  useEffect(() => {
+    if (!authed) return;
+    (async () => {
+      try {
+        const r = await window.storage.get(STORAGE_KEY);
+        if (r) {
+          const d = JSON.parse(r.value);
+          if (!d.planes) d.planes = [];
+          if (!d.catalogo || d.catalogo.length === 0)
+            d.catalogo = RECETAS_CATALOGO.map(r => ({...r, ingredientes: r.ingredientes.map(i => ({...i}))}));
+          setData(d);
+        } else {
+          setData(DEMO);
+        }
+      } catch (e) {
+        console.error("Storage error:", e);
+        setData(DEMO);
+      }
+    })();
+  }, [authed]);
+
+  // ── Pantalla de login ──
   if (!authed) return (
     <div style={{minHeight:"100vh",background:C.bg,display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
       <div style={{background:C.surface,border:`1.5px solid ${C.border}`,borderRadius:16,padding:"36px 32px",width:"100%",maxWidth:360,boxShadow:"0 8px 32px rgba(0,0,0,0.10)"}}>
@@ -1235,45 +1125,31 @@ export default function App() {
           <div style={{fontSize:12,color:C.muted,marginTop:10,letterSpacing:.5}}>Gestión de Stock & Producción</div>
         </div>
         <Field label="Contraseña">
-          <input
-            type="password" value={pass}
+          <input type="password" value={pass}
             onChange={e=>{setPass(e.target.value);setError(false);}}
             onKeyDown={e=>e.key==="Enter"&&handleLogin()}
-            autoFocus
-            placeholder="••••••••••••"
-            style={{...iSt, textAlign:"center", letterSpacing:3, fontSize:16,
-              borderColor: error ? C.danger : C.border,
-              transition:"border-color .2s"}}
-          />
+            autoFocus placeholder="••••••••••••"
+            style={{...iSt, textAlign:"center", letterSpacing:3, fontSize:16, borderColor: error ? C.danger : C.border, transition:"border-color .2s"}}/>
         </Field>
         {error && <div style={{textAlign:"center",fontSize:13,color:C.danger,marginTop:-8,marginBottom:10,fontWeight:600}}>Contraseña incorrecta</div>}
         <Btn full onClick={handleLogin} disabled={!pass}>Ingresar</Btn>
       </div>
     </div>
   );
-  const [sec,setSec] = useState("dashboard");
-  const [data,setData] = useState(null);
-  const [modal,setModal] = useState(null);
-  const [drawerOpen,setDrawerOpen] = useState(false);
 
-  useEffect(()=>{
-    (async()=>{
-      try{
-        const r=await window.storage.get(STORAGE_KEY);
-        if(r){ const d=JSON.parse(r.value); if(!d.planes)d.planes=[]; if(!d.catalogo||d.catalogo.length===0)d.catalogo=RECETAS_CATALOGO.map(r=>({...r,ingredientes:r.ingredientes.map(i=>({...i}))})); setData(d); }
-        else setData(DEMO);
-      } catch{ setData(DEMO); }
-    })();
-  },[]);
-
-  const save = async nd => { setData(nd); try{ await window.storage.set(STORAGE_KEY,JSON.stringify(nd)); }catch{} };
-
-  if(!data) return (
+  // ── Pantalla de carga ──
+  if (!data) return (
     <div style={{display:"flex",alignItems:"center",justifyContent:"center",height:"100vh",background:C.bg,flexDirection:"column",gap:16}}>
       <HerboLogo width={120} color={C.sidebar}/>
       <div style={{fontSize:14,color:C.muted}}>Cargando...</div>
     </div>
   );
+
+  const save = async nd => {
+    setData(nd);
+    try { await window.storage.set(STORAGE_KEY, JSON.stringify(nd)); }
+    catch(e) { console.error("Error al guardar:", e); }
+  };
 
   const mMap = Object.fromEntries(data.materias.map(m=>[m.id,m]));
   const rMap = Object.fromEntries(data.recetas.map(r=>[r.id,r]));
@@ -1292,8 +1168,11 @@ export default function App() {
     delPlan: id => save({...data,planes:data.planes.filter(p=>p.id!==id)}),
     updatePlanEstado: (id, estado, extra) => {
       const planes=data.planes.map(p=>p.id===id?{...p,estado,...extra}:p);
-      if(estado==="producido"){ const plan=data.planes.find(p=>p.id===id); const entry={id:genId(),recetaId:plan.recetaId,fecha:extra.fecha||todayStr(),cantidad:extra.totalProducido||plan.cantidad,operador:extra.operador||"—",notas:extra.notas||"Orden completada"}; save({...data,planes,produccion:[entry,...data.produccion]}); }
-      else save({...data,planes});
+      if(estado==="producido"){
+        const plan=data.planes.find(p=>p.id===id);
+        const entry={id:genId(),recetaId:plan.recetaId,fecha:extra.fecha||todayStr(),cantidad:extra.totalProducido||plan.cantidad,operador:extra.operador||"—",notas:extra.notas||"Orden completada"};
+        save({...data,planes,produccion:[entry,...data.produccion]});
+      } else { save({...data,planes}); }
     },
     saveProduccion: p => { const rec=rMap[p.recetaId]; let mats=[...data.materias]; if(rec)rec.ingredientes.forEach(ing=>{mats=mats.map(m=>m.id===ing.materiaId?{...m,stock:Math.max(0,m.stock-ing.cantidad*p.cantidad)}:m);}); save({...data,materias:mats,produccion:[{...p,id:genId()},...data.produccion]}); },
     delProduccion: id => save({...data,produccion:data.produccion.filter(p=>p.id!==id)}),
@@ -1322,22 +1201,24 @@ export default function App() {
     {id:"compras",icon:"⊗",label:"Compras",badge:comprasPend||null},
   ];
 
+  // ── FIX NavItem: función flecha correctamente envuelta ──
   const NavItem = ({n, onClick}) => {
-  const handleClick = onClick || (() => { setSec(n.id); setDrawerOpen(false); });
-  return (
-    <button onClick={handleClick} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 16px 10px 18px",
-      background:sec===n.id?"rgba(192,206,95,0.15)":"transparent",
-      border:"none",borderLeft:sec===n.id?`3px solid ${C.accent}`:"3px solid transparent",
-      color:sec===n.id?"#fff":"rgba(255,255,255,.62)",
-      cursor:"pointer",fontSize:14,fontFamily:"inherit",fontWeight:sec===n.id?700:400,
-      textAlign:"left",width:"100%",borderRadius:0,
-    }}>
-      <span style={{fontSize:16,width:20,textAlign:"center",flexShrink:0}}>{n.icon}</span>
-      <span style={{flex:1}}>{n.label}</span>
-      {n.badge?<span style={{background:"#c83020",color:"#fff",borderRadius:10,fontSize:10,padding:"1px 6px",fontFamily:"monospace",fontWeight:700}}>{n.badge}</span>:null}
-    </button>
-  );
-};
+    const handleClick = onClick || (() => { setSec(n.id); setDrawerOpen(false); });
+    return (
+      <button onClick={handleClick} style={{
+        display:"flex",alignItems:"center",gap:10,padding:"10px 16px 10px 18px",
+        background:sec===n.id?"rgba(192,206,95,0.15)":"transparent",
+        border:"none",borderLeft:sec===n.id?`3px solid ${C.accent}`:"3px solid transparent",
+        color:sec===n.id?"#fff":"rgba(255,255,255,.62)",
+        cursor:"pointer",fontSize:14,fontFamily:"inherit",fontWeight:sec===n.id?700:400,
+        textAlign:"left",width:"100%",borderRadius:0,
+      }}>
+        <span style={{fontSize:16,width:20,textAlign:"center",flexShrink:0}}>{n.icon}</span>
+        <span style={{flex:1}}>{n.label}</span>
+        {n.badge?<span style={{background:"#c83020",color:"#fff",borderRadius:10,fontSize:10,padding:"1px 6px",fontFamily:"monospace",fontWeight:700}}>{n.badge}</span>:null}
+      </button>
+    );
+  };
 
   const currentSection = () => {
     switch(sec){
@@ -1354,52 +1235,38 @@ export default function App() {
 
   return (
     <div style={{display:"flex",height:"100vh",fontFamily:"system-ui,-apple-system,sans-serif",background:C.bg,overflow:"hidden"}}>
-
-      {/* ── MOBILE top bar ── */}
       {isMobile && (
         <div style={{position:"fixed",top:0,left:0,right:0,height:52,background:C.sidebar,display:"flex",alignItems:"center",padding:"0 16px",zIndex:900,boxShadow:"0 2px 8px rgba(0,0,0,.2)"}}>
           <button onClick={()=>setDrawerOpen(!drawerOpen)} style={{background:"none",border:"none",cursor:"pointer",color:"#fff",fontSize:22,padding:"4px 8px 4px 0",lineHeight:1}}>☰</button>
           <HerboLogo width={80} color="#fff"/>
           <div style={{flex:1}}/>
-          <div style={{fontSize:11,color:"rgba(255,255,255,.5)",fontFamily:"monospace"}}>v4</div>
+          <div style={{fontSize:11,color:"rgba(255,255,255,.5)",fontFamily:"monospace"}}>v5</div>
         </div>
       )}
-
-      {/* ── MOBILE drawer overlay ── */}
       {isMobile && drawerOpen && (
         <div style={{position:"fixed",inset:0,zIndex:950}} onClick={()=>setDrawerOpen(false)}>
           <div style={{position:"absolute",top:0,left:0,bottom:0,width:260,background:C.sidebar,boxShadow:"4px 0 20px rgba(0,0,0,.3)"}} onClick={e=>e.stopPropagation()}>
             <div style={{padding:"18px 18px 14px",borderBottom:"1px solid rgba(255,255,255,.1)",display:"flex",alignItems:"center",gap:12}}>
               <HerboLogo width={90} color="#fff"/>
             </div>
-            <div style={{padding:"8px 0",overflowY:"auto"}}>
-              {NAV.map(n=><NavItem key={n.id} n={n}/>)}
-            </div>
+            <div style={{padding:"8px 0",overflowY:"auto"}}>{NAV.map(n=><NavItem key={n.id} n={n}/>)}</div>
             <div style={{padding:"12px 18px",borderTop:"1px solid rgba(255,255,255,.07)",fontSize:10,color:"rgba(255,255,255,.3)",fontFamily:"monospace"}}>Herbo Botanica · uso interno</div>
           </div>
         </div>
       )}
-
-      {/* ── DESKTOP sidebar ── */}
       {!isMobile && (
         <aside style={{width:226,background:C.sidebar,display:"flex",flexDirection:"column",flexShrink:0}}>
           <div style={{padding:"20px 18px 16px",borderBottom:"1px solid rgba(255,255,255,.1)"}}>
             <HerboLogo width={110} color="#fff"/>
             <div style={{fontSize:10,color:"rgba(255,255,255,.4)",marginTop:8,letterSpacing:.5}}>Gestión de Stock & Producción</div>
           </div>
-          <nav style={{flex:1,padding:"8px 0",overflowY:"auto"}}>
-            {NAV.map(n=><NavItem key={n.id} n={n}/>)}
-          </nav>
-          <div style={{padding:"12px 18px",borderTop:"1px solid rgba(255,255,255,.07)",fontSize:10,color:"rgba(255,255,255,.25)",fontFamily:"monospace"}}>v4.0 · uso interno</div>
+          <nav style={{flex:1,padding:"8px 0",overflowY:"auto"}}>{NAV.map(n=><NavItem key={n.id} n={n}/>)}</nav>
+          <div style={{padding:"12px 18px",borderTop:"1px solid rgba(255,255,255,.07)",fontSize:10,color:"rgba(255,255,255,.25)",fontFamily:"monospace"}}>v5.0 · uso interno</div>
         </aside>
       )}
-
-      {/* ── Main content ── */}
       <main style={{flex:1,overflow:"auto",display:"flex",flexDirection:"column",minWidth:0,...(isMobile?{paddingTop:52}:{})}}>
         {currentSection()}
       </main>
-
-      {/* ── Modals ── */}
       {modal?.type==="materia"&&<MateriaForm item={modal.data} onSave={m=>{H.saveMateria(m);setModal(null);}} onClose={()=>setModal(null)}/>}
       {modal?.type==="precio"&&<PrecioForm materia={modal.data} onSave={m=>{H.saveMateria(m);setModal(null);}} onClose={()=>setModal(null)}/>}
       {modal?.type==="plan"&&<PlanForm item={modal.data} catalogo={data.catalogo||[]} onSave={p=>{H.savePlan(p);setModal(null);}} onClose={()=>setModal(null)}/>}
