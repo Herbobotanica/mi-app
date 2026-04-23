@@ -1,3 +1,6 @@
+import { api } from "./api.js";
+import { useUI } from "./ui.jsx";
+
 import { useState, useEffect, useRef } from "react";
 
 const STORAGE_KEY = "herbo_v2";
@@ -101,133 +104,7 @@ const RECETAS_CATALOGO = [
   {id:"rescuer_-RR",nombre:"Rescue Remedy - Remedio de Rescate Bach Pets",sku:"HB-HUM-FL-RR",categoria:"Pets",costoTotal:1015.64,ingredientes:[{insumo:"Etiquetas",proveedor:"",unidad:"unidad",cantidad:1.0,costoUnitario:70.0,costoTotal:70.0},{insumo:"Flor de California / Bach / Orquidea",proveedor:"",unidad:"2 gotas",cantidad:4.0,costoUnitario:34.76,costoTotal:139.04},{insumo:"Frasco Euro 30 ml verde con precinto",proveedor:"",unidad:"Unidad",cantidad:1.0,costoUnitario:756.0,costoTotal:756.0},{insumo:"Glicerina vegetal",proveedor:"",unidad:"mililitros",cantidad:10.0,costoUnitario:5.06,costoTotal:50.6}]},
 ];
 
-const MATERIAS_REALES = [
-  {nombre:"Aceite de Almendras",proveedor:"Química Eiffel",unidad:"litro",precio:11030.40,fechaCosto:"2025-11-28"},
-  {nombre:"Aceite de Coco",proveedor:"Química Eiffel",unidad:"ml",precio:14.40,fechaCosto:"2025-11-28"},
-  {nombre:"Aceite de Ricino",proveedor:"Química Eiffel",unidad:"ml",precio:14.70,fechaCosto:"2025-11-28"},
-  {nombre:"Aceite Esencial de Bergamota",proveedor:"Química Eiffel",unidad:"ml",precio:141.40,fechaCosto:"2025-11-28"},
-  {nombre:"Aceite Esencial de Canela",proveedor:"Química Eiffel",unidad:"ml",precio:220.00,fechaCosto:"2025-11-28"},
-  {nombre:"Aceite Esencial de Cipré",proveedor:"Química Eiffel",unidad:"ml",precio:108.00,fechaCosto:"2025-11-28"},
-  {nombre:"Aceite Esencial de Citronella",proveedor:"Química Eiffel",unidad:"ml",precio:125.40,fechaCosto:"2025-11-28"},
-  {nombre:"Aceite Esencial de Clavo de Olor",proveedor:"Química Eiffel",unidad:"ml",precio:270.00,fechaCosto:"2025-11-28"},
-  {nombre:"Aceite Esencial de Eucaliptos",proveedor:"Química Eiffel",unidad:"ml",precio:114.90,fechaCosto:"2026-03-06"},
-  {nombre:"Aceite Esencial de Jazmín",proveedor:"Química Eiffel",unidad:"ml",precio:140.00,fechaCosto:"2026-03-05"},
-  {nombre:"Aceite Esencial de Lavanda",proveedor:"Química Eiffel",unidad:"ml",precio:153.38,fechaCosto:"2026-03-05"},
-  {nombre:"Aceite Esencial de Limón",proveedor:"Química Eiffel",unidad:"ml",precio:150.00,fechaCosto:"2025-11-28"},
-  {nombre:"Aceite Esencial de Manzanilla",proveedor:"Química Eiffel",unidad:"ml",precio:1200.00,fechaCosto:"2025-11-28"},
-  {nombre:"Aceite Esencial de Menta",proveedor:"Química Eiffel",unidad:"ml",precio:225.00,fechaCosto:"2025-11-28"},
-  {nombre:"Aceite Esencial de Naranja",proveedor:"Química Eiffel",unidad:"ml",precio:100.00,fechaCosto:"2025-11-28"},
-  {nombre:"Aceite Esencial de Neroli",proveedor:"Química Eiffel",unidad:"ml",precio:158.80,fechaCosto:"2026-03-05"},
-  {nombre:"Aceite Esencial de Romero",proveedor:"Química Eiffel",unidad:"ml",precio:125.00,fechaCosto:"2025-11-28"},
-  {nombre:"Aceite Esencial de Rosas",proveedor:"Química Eiffel",unidad:"ml",precio:171.00,fechaCosto:"2025-11-28"},
-  {nombre:"Aceite Esencial de Tea Tree",proveedor:"Química Eiffel",unidad:"ml",precio:206.08,fechaCosto:"2025-11-28"},
-  {nombre:"Aceite Esencial Ylang Ylang",proveedor:"",unidad:"ml",precio:208.00,fechaCosto:"2025-11-14"},
-  {nombre:"Aceite Rosa Mosqueta",proveedor:"Química Eiffel",unidad:"ml",precio:14.24,fechaCosto:"2025-11-29"},
-  {nombre:"Agua de Rosas",proveedor:"Química Eiffel",unidad:"ml",precio:6.74,fechaCosto:"2025-11-28"},
-  {nombre:"Agua Destilada",proveedor:"",unidad:"ml",precio:1.57,fechaCosto:"2025-11-03"},
-  {nombre:"Alcohol de Cereal",proveedor:"Adecolab",unidad:"ml",precio:0.65,fechaCosto:"2025-11-28"},
-  {nombre:"Atomizador enfundado plata/oro Bruma",proveedor:"Megaenvases",unidad:"unid",precio:750.00,fechaCosto:"2025-02-11"},
-  {nombre:"Balón de 100 ml pirex",proveedor:"Pasteur",unidad:"unid",precio:8421.60,fechaCosto:"2026-03-04"},
-  {nombre:"Bolsa chicha 15x20",proveedor:"Chicha Serigrafía",unidad:"unid",precio:1045.00,fechaCosto:"2026-03-04"},
-  {nombre:"Brillo Labial - Roll On",proveedor:"Byf Deco",unidad:"unid",precio:513.00,fechaCosto:"2026-03-05"},
-  {nombre:"Cadenita acero dorada para collar",proveedor:"Prosperidad cristales",unidad:"unid",precio:2450.00,fechaCosto:"2024-08-15"},
-  {nombre:"Cadenita acero plateado para collar",proveedor:"Prosperidad cristales",unidad:"unid",precio:1000.00,fechaCosto:"2024-08-15"},
-  {nombre:"Cera de Abeja",proveedor:"Química Eiffel",unidad:"g",precio:27.00,fechaCosto:"2025-11-28"},
-  {nombre:"Cera de Soja",proveedor:"Iskka Home",unidad:"g",precio:4.99,fechaCosto:"2025-02-11"},
-  {nombre:"Cristales de Mentol",proveedor:"Química Eiffel",unidad:"g",precio:78.00,fechaCosto:"2025-11-29"},
-  {nombre:"Dije Bipolar collar",proveedor:"Prosperidad cristales",unidad:"unid",precio:1602.00,fechaCosto:"2024-08-15"},
-  {nombre:"Dije cristal bruto plateado",proveedor:"Prosperidad cristales",unidad:"unid",precio:1634.00,fechaCosto:"2024-08-15"},
-  {nombre:"Dije cristal Dorado",proveedor:"Prosperidad cristales",unidad:"unid",precio:1458.00,fechaCosto:"2024-08-15"},
-  {nombre:"Dije Turmalina grande",proveedor:"Prosperidad cristales",unidad:"unid",precio:1782.00,fechaCosto:"2024-08-15"},
-  {nombre:"Endurecedor",proveedor:"Iskka Home",unidad:"g",precio:9.80,fechaCosto:"2025-02-11"},
-  {nombre:"Envase Aluminio Roma x 150 ml",proveedor:"Megaenvases",unidad:"unid",precio:1289.00,fechaCosto:"2025-02-11"},
-  {nombre:"Envase Bruma Aurica pet cristal x 60 ml + atomizador",proveedor:"Microbottles",unidad:"unid",precio:644.00,fechaCosto:"2026-03-04"},
-  {nombre:"Envase Omega x 250ml AMBAR con atomizador negro",proveedor:"Microbottles",unidad:"unid",precio:487.86,fechaCosto:"2026-03-04"},
-  {nombre:"Envase Pet Omega Cristal x 250 ml + tapa difusora",proveedor:"Microbottles",unidad:"unid",precio:740.00,fechaCosto:"2025-11-28"},
-  {nombre:"Envase Pet Spray Home Heaven 200 ml",proveedor:"Vs Envases",unidad:"unid",precio:850.00,fechaCosto:"2026-03-05"},
-  {nombre:"Envase Pet Teo 120 ml capuchon plateado Brumas KIDS",proveedor:"Vs Envases",unidad:"unid",precio:780.00,fechaCosto:"2026-03-05"},
-  {nombre:"Envase Tubo x 20 ml ambar + spray R/18",proveedor:"Frascarg",unidad:"unid",precio:662.40,fechaCosto:"2025-11-28"},
-  {nombre:"Erlenmeyer 250 ml",proveedor:"Pasteur",unidad:"unid",precio:3625.00,fechaCosto:"2025-02-11"},
-  {nombre:"Esencia Aphrodita Spray Home",proveedor:"Laboratorio de Aromas",unidad:"ml",precio:31.87,fechaCosto:"2025-11-28"},
-  {nombre:"Esencia Difusor - Hibiscus",proveedor:"Laboratorio de Aromas",unidad:"ml",precio:51.86,fechaCosto:"2025-11-28"},
-  {nombre:"Esencia Java - Spray Home",proveedor:"Laboratorio de Aromas",unidad:"ml",precio:44.54,fechaCosto:"2025-11-28"},
-  {nombre:"Esencia Pura de Bergamota",proveedor:"Arofragancias",unidad:"ml",precio:80.69,fechaCosto:"2025-02-11"},
-  {nombre:"Esencia Pura de Café",proveedor:"Arofragancias",unidad:"ml",precio:62.50,fechaCosto:"2025-02-11"},
-  {nombre:"Esencia Pura de Canela",proveedor:"Arofragancias",unidad:"ml",precio:65.68,fechaCosto:"2025-02-11"},
-  {nombre:"Esencia Pura de Eucaliptus",proveedor:"Arofragancias",unidad:"ml",precio:79.56,fechaCosto:"2025-02-11"},
-  {nombre:"Esencia Pura de Jengibre",proveedor:"Arofragancias",unidad:"ml",precio:80.68,fechaCosto:"2025-02-11"},
-  {nombre:"Esencia Pura de Lavanda",proveedor:"Arofragancias",unidad:"ml",precio:65.68,fechaCosto:"2025-02-11"},
-  {nombre:"Esencia Pura de Nardo",proveedor:"Arofragancias",unidad:"ml",precio:65.68,fechaCosto:"2025-02-11"},
-  {nombre:"Esencia Pura de Neroli",proveedor:"Arofragancias",unidad:"ml",precio:82.85,fechaCosto:"2025-02-11"},
-  {nombre:"Esencia Pura de Pomelo",proveedor:"Arofragancias",unidad:"ml",precio:65.68,fechaCosto:"2025-02-11"},
-  {nombre:"Esencia Pura de Rosa",proveedor:"Arofragancias",unidad:"ml",precio:79.92,fechaCosto:"2025-02-11"},
-  {nombre:"Esencia Pura de Sándalo",proveedor:"Arofragancias",unidad:"ml",precio:79.92,fechaCosto:"2025-02-11"},
-  {nombre:"Esencia Pura de Vainilla",proveedor:"Arofragancias",unidad:"ml",precio:80.68,fechaCosto:"2025-02-11"},
-  {nombre:"Esencia Spray Home Canela, Vainilla y Tabaco",proveedor:"Laboratorio de Aromas",unidad:"ml",precio:14.31,fechaCosto:"2025-11-28"},
-  {nombre:"Etiquetas",proveedor:"Nirat",unidad:"unid",precio:70.00,fechaCosto:"2026-03-05"},
-  {nombre:"Fabricación Vela - Laboratorio de Aromas",proveedor:"Laboratorio de Aromas",unidad:"unid",precio:6900.00,fechaCosto:"2025-11-28"},
-  {nombre:"Flor de Bush",proveedor:"Laboratorio Floral",unidad:"dosis",precio:103.68,fechaCosto:"2025-11-28"},
-  {nombre:"Flor de California / Bach / Orquídea",proveedor:"Londers",unidad:"2 gotas",precio:34.76,fechaCosto:"2025-11-28"},
-  {nombre:"Frasco Euro 10 ml ambar con precinto",proveedor:"Frascarg",unidad:"unid",precio:617.40,fechaCosto:"2025-11-28"},
-  {nombre:"Frasco Euro 10 ml cristal tapa dorada gotero blanco",proveedor:"Frascarg",unidad:"unid",precio:814.50,fechaCosto:"2025-11-28"},
-  {nombre:"Frasco Euro 10 ml verde con precinto",proveedor:"Frascarg",unidad:"unid",precio:722.70,fechaCosto:"2025-11-28"},
-  {nombre:"Frasco Euro 30 ml ambar con precinto",proveedor:"Frascarg",unidad:"unid",precio:594.00,fechaCosto:"2026-03-05"},
-  {nombre:"Frasco Euro 30 ml azul con precinto",proveedor:"Frascarg",unidad:"unid",precio:594.00,fechaCosto:"2025-11-28"},
-  {nombre:"Frasco Euro 30 ml cristal tapa dorada gotero blanco",proveedor:"Frascarg",unidad:"unid",precio:945.00,fechaCosto:"2025-11-28"},
-  {nombre:"Frasco Euro 30 ml verde con precinto",proveedor:"Frascarg",unidad:"unid",precio:756.00,fechaCosto:"2026-03-05"},
-  {nombre:"Frasco Euro 50 ml ambar con precinto",proveedor:"Frascarg",unidad:"unid",precio:617.00,fechaCosto:"2025-11-28"},
-  {nombre:"Frasco Jupiter Sales",proveedor:"",unidad:"unid",precio:700.00,fechaCosto:"2025-09-02"},
-  {nombre:"Frasco Tubo Cristal x 50 ml + enfundado dorado R18",proveedor:"Megaenvases",unidad:"unid",precio:1600.00,fechaCosto:"2025-02-11"},
-  {nombre:"Gatillo Mini Trigger rosca 24 negro",proveedor:"Megaenvases",unidad:"unid",precio:880.00,fechaCosto:"2025-02-11"},
-  {nombre:"Gel Aloe",proveedor:"Química Eiffel",unidad:"ml",precio:24.06,fechaCosto:"2025-11-29"},
-  {nombre:"Glicerina Vegetal",proveedor:"",unidad:"ml",precio:5.06,fechaCosto:"2025-12-23"},
-  {nombre:"Hidrolato de Lavanda",proveedor:"Química Eiffel",unidad:"ml",precio:5.10,fechaCosto:"2025-11-28"},
-  {nombre:"Hidrolato de Manzanilla",proveedor:"Química Eiffel",unidad:"ml",precio:3.43,fechaCosto:"2026-03-05"},
-  {nombre:"Hierbas",proveedor:"",unidad:"unid",precio:500.00,fechaCosto:"2025-09-02"},
-  {nombre:"Honorarios Jane",proveedor:"",unidad:"unid",precio:25000.00,fechaCosto:"2025-12-23"},
-  {nombre:"Lata Pastillero Bálsamo",proveedor:"",unidad:"unid",precio:350.00,fechaCosto:"2025-01-29"},
-  {nombre:"Londres",proveedor:"Laboratorio de Aromas",unidad:"ml",precio:16.82,fechaCosto:"2025-12-23"},
-  {nombre:"Malasia",proveedor:"Laboratorio de Aromas",unidad:"ml",precio:50.73,fechaCosto:"2025-12-23"},
-  {nombre:"Manteca de Karité",proveedor:"Química Eiffel",unidad:"g",precio:28.70,fechaCosto:"2025-11-28"},
-  {nombre:"Ojalillos",proveedor:"Iskka Home",unidad:"unid",precio:34.10,fechaCosto:"2024-07-31"},
-  {nombre:"Oleato de Caléndula",proveedor:"Química Eiffel",unidad:"ml",precio:13.70,fechaCosto:"2025-11-28"},
-  {nombre:"Oleato de Rosa Mosqueta",proveedor:"Química Eiffel",unidad:"ml",precio:12.86,fechaCosto:"2025-11-28"},
-  {nombre:"Pabilo para Vela de Soja Grueso",proveedor:"Iskka Home",unidad:"unid",precio:2.80,fechaCosto:"2025-02-11"},
-  {nombre:"Packaging",proveedor:"",unidad:"unid",precio:330.00,fechaCosto:"2026-03-05"},
-  {nombre:"Pote ambar 100 ml con tapa plateada",proveedor:"Frascarg",unidad:"unid",precio:1215.00,fechaCosto:"2025-11-28"},
-  {nombre:"Pote ambar 30 ml con tapa plateada",proveedor:"Frascarg",unidad:"unid",precio:936.00,fechaCosto:"2026-03-05"},
-  {nombre:"Raíz de Valeriana",proveedor:"",unidad:"ml",precio:11.49,fechaCosto:"2025-02-11"},
-  {nombre:"Ro ambar 60 ml + atomizador Negro",proveedor:"Microbottles",unidad:"unid",precio:318.06,fechaCosto:"2026-03-05"},
-  {nombre:"Rosca difusora spray 18 pata gotero",proveedor:"Frascarg",unidad:"unid",precio:207.00,fechaCosto:"2025-11-28"},
-  {nombre:"Ruda, Clavo, Canela",proveedor:"Laboratorio de Aromas",unidad:"ml",precio:36.97,fechaCosto:"2025-11-28"},
-  {nombre:"Sahumerio Sagrada Madre Caléndula",proveedor:"Grupo Utopía",unidad:"unid",precio:1012.00,fechaCosto:"2024-07-31"},
-  {nombre:"Sahumerio Sagrada Madre Salvia Blanca",proveedor:"Grupo Utopía",unidad:"unid",precio:1012.00,fechaCosto:"2024-07-31"},
-  {nombre:"Sahumerio Sagrada Madre Lavanda",proveedor:"Grupo Utopía",unidad:"unid",precio:1012.00,fechaCosto:"2024-07-31"},
-  {nombre:"Sahumerio Sagrada Madre Rosas",proveedor:"Grupo Utopía",unidad:"unid",precio:1012.00,fechaCosto:"2024-07-31"},
-  {nombre:"Sal Gruesa Himalaya",proveedor:"",unidad:"g",precio:0.30,fechaCosto:"2025-09-02"},
-  {nombre:"Stock Bottle Bach",proveedor:"Londers",unidad:"2 gotas",precio:34.76,fechaCosto:"2025-11-28"},
-  {nombre:"Stock Bottle Bush",proveedor:"Laboratorio Floral",unidad:"7 gotas",precio:131.00,fechaCosto:"2025-11-28"},
-  {nombre:"Stock Bottle California",proveedor:"Londers",unidad:"2 gotas",precio:34.76,fechaCosto:"2025-11-28"},
-  {nombre:"Stock Bottle Flores",proveedor:"Londers",unidad:"unid",precio:4937.50,fechaCosto:"2025-11-28"},
-  {nombre:"Stock Bottle Saint Germain",proveedor:"Laboratorio Floral",unidad:"2 gotas",precio:40.00,fechaCosto:"2025-11-28"},
-  {nombre:"Tabaco Rubio",proveedor:"Laboratorio de Aromas",unidad:"ml",precio:14.81,fechaCosto:"2025-11-28"},
-  {nombre:"Tahití",proveedor:"Laboratorio de Aromas",unidad:"ml",precio:170.31,fechaCosto:"2025-12-23"},
-  {nombre:"Tarde de Otoño",proveedor:"Laboratorio de Aromas",unidad:"ml",precio:21.00,fechaCosto:"2025-11-28"},
-  {nombre:"Totebag Dog Love",proveedor:"Chicha Serigrafía",unidad:"unid",precio:2959.00,fechaCosto:"2025-11-03"},
-  {nombre:"Trípode Metal + base cemento",proveedor:"Jorge",unidad:"unid",precio:3800.00,fechaCosto:"2026-02-24"},
-  {nombre:"Varillas de Ratan",proveedor:"",unidad:"unid",precio:67.20,fechaCosto:"2025-11-03"},
-  {nombre:"Vaso Precipitado x 25 ml",proveedor:"Pasteur",unidad:"unid",precio:2668.00,fechaCosto:"2026-02-23"},
-  {nombre:"Vela Blanca",proveedor:"Grupo Utopía",unidad:"unid",precio:224.00,fechaCosto:"2024-07-31"},
-  {nombre:"Vela de Noche x 12 unidades",proveedor:"Grupo Utopía",unidad:"unid",precio:694.00,fechaCosto:"2024-07-31"},
-  {nombre:"Vela Dorada",proveedor:"Grupo Utopía",unidad:"unid",precio:524.00,fechaCosto:"2024-07-31"},
-  {nombre:"Vela Plateada",proveedor:"Grupo Utopía",unidad:"unid",precio:524.00,fechaCosto:"2024-07-31"},
-  {nombre:"Vela Rosa",proveedor:"Grupo Utopía",unidad:"unid",precio:224.00,fechaCosto:"2024-07-31"},
-  {nombre:"Vela Violeta",proveedor:"Grupo Utopía",unidad:"unid",precio:224.00,fechaCosto:"2024-07-31"},
-  {nombre:"Vitamina E",proveedor:"Química Eiffel",unidad:"ml",precio:136.82,fechaCosto:"2025-11-29"},
-  {nombre:"Vodka - Smirnoff",proveedor:"",unidad:"ml",precio:13.44,fechaCosto:"2025-11-03"},
-].map((m,i)=>({...m,id:`m${i+1}`,stock:0,stockMin:0}));
-
-const DEMO = { materias: MATERIAS_REALES, recetas: [], produccion: [], planes: [], compras: [], catalogo: RECETAS_CATALOGO.map(r=>({...r,ingredientes:r.ingredientes.map(i=>({...i}))})) };
+const DEMO = { materias: [], recetas: [], produccion: [], planes: [], compras: [], catalogo: RECETAS_CATALOGO.map(r=>({...r,ingredientes:r.ingredientes.map(i=>({...i}))})) };
 
 function useMobile() {
   const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" && window.innerWidth < 768);
@@ -238,6 +115,7 @@ function useMobile() {
   }, []);
   return isMobile;
 }
+
 
 function HerboLogo({ width = 100, color = "#ffffff" }) {
   return (
@@ -915,7 +793,7 @@ function Compras({ data, materiasMap, lowStock, handlers, setModal }) {
 }
 
 function MateriaForm({ item, onSave, onClose }) {
-  const [f,setF]=useState(item||{nombre:"",proveedor:"",unidad:"ml",stock:0,precio:0,stockMin:0,fechaCosto:todayStr()});
+  const [f,setF]=useState(item||{nombre:"",proveedor:"",unidad:"ml",stock:0,precio:0,stockMin:0,fechaCosto: item?.fechaCosto || todayStr()});
   const s=(k,v)=>setF(p=>({...p,[k]:v}));
   return(<Modal title={item?"Editar insumo":"Nuevo insumo"} onClose={onClose}>
     <TI label="Nombre" required value={f.nombre} onChange={e=>s("nombre",e.target.value)}/>
@@ -1071,6 +949,7 @@ function CompraManualForm({ onSave, onClose }) {
 // ─── App — FIX: todos los hooks ANTES de cualquier return ─────────────────────
 export default function App() {
   const isMobile = useMobile();
+  const { ui, UIComponents } = useUI();
 
   // ── Auth state ──
   const [authed, setAuthed] = useState(() => sessionStorage.getItem("herbo_auth") === "1");
@@ -1099,18 +978,14 @@ export default function App() {
     if (!authed) return;
     (async () => {
       try {
-        const r = await window.storage.get(STORAGE_KEY);
-        if (r) {
-          const d = JSON.parse(r.value);
-          if (!d.planes) d.planes = [];
-          if (!d.catalogo || d.catalogo.length === 0)
-            d.catalogo = RECETAS_CATALOGO.map(r => ({...r, ingredientes: r.ingredientes.map(i => ({...i}))}));
-          setData(d);
+        const res = await api.getMateriales();
+        if (res.ok) {
+          setData({ ...DEMO, materias: res.data });
         } else {
           setData(DEMO);
         }
       } catch (e) {
-        console.error("Storage error:", e);
+        console.error("Error cargando materiales:", e);
         setData(DEMO);
       }
     })();
@@ -1158,8 +1033,43 @@ export default function App() {
   const lowStock = data.materias.filter(m=>m.stockMin>0&&m.stock<=m.stockMin);
 
   const H = {
-    saveMateria: m => save({...data,materias:data.materias.find(x=>x.id===m.id)?data.materias.map(x=>x.id===m.id?m:x):[...data.materias,m]}),
-    delMaterias: ids => save({...data,materias:data.materias.filter(m=>!ids.includes(m.id))}),
+    // --- MATERIALES (ahora con Sheets) ---
+    saveMateria: async (m) => {
+      ui.loading("Guardando material...");
+      try {
+        const res = await api.saveMaterial(m);
+        if (res.ok) {
+          setData(prev => ({
+            ...prev,
+            materias: prev.materias.find(x => x.id === m.id)
+              ? prev.materias.map(x => x.id === m.id ? m : x)
+              : [...prev.materias, m]
+          }));
+          ui.success("Material guardado correctamente");
+        } else {
+          ui.error("No se pudo guardar el material", res.error || "Error desconocido");
+        }
+      } catch (e) {
+        ui.error("Error de conexión al guardar", e.message);
+      }
+    },    
+    delMaterias: async (ids) => {
+      ui.loading("Eliminando...");
+      try {
+        const res = await api.deleteMateriales(ids);
+        if (res.ok) {
+          setData(prev => ({
+            ...prev,
+            materias: prev.materias.filter(m => !ids.includes(m.id))
+          }));
+          ui.success("Eliminado correctamente");
+        } else {
+          ui.error("No se pudo eliminar", res.error || "Error desconocido");
+        }
+      } catch (e) {
+        ui.error("Error de conexión al eliminar", e.message);
+      }
+    },
     saveReceta: r => save({...data,recetas:data.recetas.find(x=>x.id===r.id)?data.recetas.map(x=>x.id===r.id?r:x):[...data.recetas,r]}),
     delReceta: id => save({...data,recetas:data.recetas.filter(r=>r.id!==id)}),
     savePlan: p => save({...data,planes:data.planes.find(x=>x.id===p.id)?data.planes.map(x=>x.id===p.id?p:x):[...data.planes,p]}),
@@ -1274,6 +1184,9 @@ export default function App() {
       {modal?.type==="producido"&&<ProducidoForm plan={modal.plan} catalogoMap={cMap} onSave={f=>{H.updatePlanEstado(modal.plan.id,"producido",f);setModal(null);}} onClose={()=>setModal(null)}/>}
       {modal?.type==="produccionCat"&&<ProduccionForm recetaId={modal.recetaId} cantidad={modal.cantidad} recetas={data.catalogo||[]} onSave={p=>{H.saveProduccion(p);setModal(null);}} onClose={()=>setModal(null)}/>}
       {modal?.type==="compraManual"&&<CompraManualForm onSave={c=>{H.addCompraManual(c);setModal(null);}} onClose={()=>setModal(null)}/>}
+
+      <UIComponents />
+
     </div>
   );
 }
