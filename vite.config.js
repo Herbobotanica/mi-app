@@ -6,10 +6,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/api/proxy': {
-        target: 'https://script.google.com/macros/s/AKfycbydPvxfDbCiFv4cv3xHTtfU9DliO8PFzJ3ePnCcAfooZ-kemNTm2oQDv_mtPHhtGvDq',
+        target: 'http://localhost:3001',
         changeOrigin: true,
-        rewrite: (path) => path.replace('/api/proxy', '/exec'),
-        followRedirects: true,
       }
     }
   }
