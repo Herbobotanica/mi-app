@@ -8,7 +8,7 @@ const genId = () => Math.random().toString(36).slice(2, 9);
 const fmt = (n, d = 2) => typeof n === "number" ? n.toLocaleString("es-AR", { minimumFractionDigits: d, maximumFractionDigits: d }) : "—";
 const fmtARS = n => `$ ${fmt(n)}`;
 const todayStr = () => new Date().toISOString().slice(0, 10);
-const fmtF = s => s ? new Date(s + "T12:00:00").toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "2-digit" }) : "—";
+const fmtF = s => s ? new Date(s + "T12:00:00").toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" }) : "—";
 const diasDesde = s => s ? Math.floor((Date.now() - new Date(s + "T12:00:00")) / 86400000) : null;
 const getWeekRange = () => {
   const n = new Date(); const day = n.getDay();
@@ -143,8 +143,8 @@ const TAI = ({label,required,...p}) => <Field label={label} required={required}>
 
 function Modal({ title, children, onClose, width=520 }) {
   return (
-    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",display:"flex",alignItems:"flex-end",justifyContent:"center",zIndex:2000,padding:0}} onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
-      <div style={{background:C.surface,borderRadius:"16px 16px 0 0",width:"100%",maxWidth:width,maxHeight:"92vh",overflow:"auto",boxShadow:"0 -8px 40px rgba(0,0,0,0.2)"}}>
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:2000,padding:0}} onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
+      <div style={{background:C.surface,borderRadius:"16px",width:"100%",maxWidth:width,maxHeight:"92vh",overflow:"auto",boxShadow:"0 -8px 40px rgba(0,0,0,0.2)"}}>
         <div style={{padding:"16px 20px 14px",borderBottom:`1.5px solid ${C.border}`,display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,background:C.surface,zIndex:1}}>
           <h3 style={{fontSize:16,fontWeight:700,color:C.text,margin:0}}>{title}</h3>
           <button onClick={onClose} style={{background:"none",border:"none",cursor:"pointer",color:C.muted,fontSize:20,lineHeight:1,padding:"2px 6px",borderRadius:6}}>✕</button>
@@ -308,8 +308,12 @@ function Materias({ data, handlers, setModal }) {
   const allSelected = filtered.length>0&&filtered.every(m=>sel.has(m.id));
   const toggleAll = () => { if(allSelected){const s=new Set(sel);filtered.forEach(m=>s.delete(m.id));setSel(s);}else{const s=new Set(sel);filtered.forEach(m=>s.add(m.id));setSel(s);} };
   const toggleOne = id => { const s=new Set(sel); s.has(id)?s.delete(id):s.add(id); setSel(s); };
-  const bulkDelete = () => { if(!window.confirm(`¿Eliminar ${sel.size} insumo${sel.size>1?"s":""}?`))return; handlers.delMaterias([...sel]); setSel(new Set()); };
-  const st = m => {
+  const bulkDelete = async () => {
+    const ok = await handlers.confirm(`¿Seguro que querés eliminar ${sel.size} insumo${sel.size > 1 ? "s" : ""}?`);
+    if (!ok) return;
+    handlers.delMaterias([...sel]);
+    setSel(new Set());
+  };  const st = m => {
     if(m.stockMin>0&&m.stock===0) return {label:"Sin stock",color:"red"};
     if(m.stockMin>0&&m.stock<=m.stockMin) return {label:"Bajo",color:"yellow"};
     if(m.stockMin===0) return {label:"—",color:"gray"};
@@ -349,10 +353,13 @@ function Materias({ data, handlers, setModal }) {
                   <div style={{background:C.alt,borderRadius:8,padding:"8px 10px"}}><div style={{fontSize:10,color:C.muted,fontWeight:700,textTransform:"uppercase",marginBottom:3}}>Precio / {m.unidad}</div><div style={{fontSize:13,fontFamily:"monospace",fontWeight:600,color:viejo?C.warning:C.text}}>{fmtARS(m.precio)}{viejo&&<span style={{marginLeft:4}}>⚠</span>}</div></div>
                   <div style={{background:C.terraBg,borderRadius:8,padding:"8px 10px"}}><div style={{fontSize:10,color:C.terra,fontWeight:700,textTransform:"uppercase",marginBottom:3}}>Valor total</div><div style={{fontSize:13,fontFamily:"monospace",fontWeight:700,color:C.terra}}>{m.stock>0?fmtARS(m.stock*m.precio):"—"}</div></div>
                 </div>
-                <div style={{display:"flex",gap:8}}>
-                  <Btn size="sm" variant="success" onClick={()=>setModal({type:"precio",data:m})}>$ ↑</Btn>
-                  <Btn size="sm" variant="ghost" onClick={()=>setModal({type:"materia",data:m})}>✎ Editar</Btn>
-                  <Btn size="sm" variant="danger" onClick={()=>{if(window.confirm(`¿Eliminar?`))handlers.delMaterias([m.id]);}}>✕</Btn>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <Btn size="sm" variant="success" onClick={() => setModal({ type: "precio", data: m })}>$ ↑</Btn>
+                  <Btn size="sm" variant="ghost" onClick={() => setModal({ type: "materia", data: m })}>✎ Editar</Btn>
+                  <Btn size="sm" variant="danger" onClick={async () => {
+                    const ok = await handlers.confirm("¿Seguro que querés eliminar este insumo?");
+                    if (ok) handlers.delMaterias([m.id]);
+                  }}>✕</Btn>
                 </div>
               </MCard>);
             })}
@@ -375,8 +382,7 @@ function Materias({ data, handlers, setModal }) {
                     <TD>{inlineNum(m,"stockMin")}</TD>
                     <TD mono bold color={C.terra}>{m.stock>0?fmtARS(m.stock*m.precio):"—"}</TD>
                     <TD><Badge text={s.label} color={s.color}/></TD>
-                    <TD><div style={{display:"flex",gap:4}}><Btn size="sm" variant="success" onClick={()=>setModal({type:"precio",data:m})}>$ ↑</Btn><Btn size="sm" variant="ghost" onClick={()=>setModal({type:"materia",data:m})}>✎</Btn><Btn size="sm" variant="danger" onClick={()=>{if(window.confirm(`¿Eliminar "${m.nombre}"?`))handlers.delMaterias([m.id]);}}>✕</Btn></div></TD>
-                  </tr>);
+                    <TD><div style={{display:"flex",gap:4}}><Btn size="sm" variant="success" onClick={()=>setModal({type:"precio",data:m})}>$ ↑</Btn><Btn size="sm" variant="ghost" onClick={()=>setModal({type:"materia",data:m})}>✎</Btn><Btn size="sm" variant="danger" onClick={async()=>{const ok=await handlers.confirm(`¿Eliminar "${m.nombre}"?`);if(ok)handlers.delMaterias([m.id]);}}>✕</Btn></div></TD></tr>);
                 })}
               </tbody>
             </table>
@@ -538,7 +544,10 @@ function PlanProduccion({ data, handlers, setModal }) {
                   {p.estado==="por_hacer"&&<Btn size="sm" variant="info" onClick={()=>handlers.updatePlanEstado(p.id,"en_proceso",{})}>▶ En proceso</Btn>}
                   {p.estado==="en_proceso"&&<Btn size="sm" variant="success" onClick={()=>setModal({type:"producido",plan:p})}>✓ Producido</Btn>}
                   {p.estado!=="producido"&&<Btn size="sm" variant="ghost" onClick={()=>setModal({type:"plan",data:p})}>✎ Editar</Btn>}
-                  <Btn size="sm" variant="danger" onClick={()=>{if(window.confirm("¿Eliminar?"))handlers.delPlan(p.id);}}>✕</Btn>
+                  <Btn size="sm" variant="danger" onClick={async () => {
+                    const ok = await handlers.confirm("¿Seguro que querés eliminar este plan de producción?");
+                    if (ok) handlers.delPlan(p.id);
+                  }}>✕</Btn>
                 </div>
               </MCard>);
             })}
@@ -564,7 +573,10 @@ function PlanProduccion({ data, handlers, setModal }) {
                         {p.estado==="por_hacer"&&<Btn size="sm" variant="info" onClick={()=>handlers.updatePlanEstado(p.id,"en_proceso",{})}>▶ En proceso</Btn>}
                         {p.estado==="en_proceso"&&<Btn size="sm" variant="success" onClick={()=>setModal({type:"producido",plan:p})}>✓ Producido</Btn>}
                         {p.estado!=="producido"&&<Btn size="sm" variant="ghost" onClick={()=>setModal({type:"plan",data:p})}>✎</Btn>}
-                        <Btn size="sm" variant="danger" onClick={()=>{if(window.confirm("¿Eliminar?"))handlers.delPlan(p.id);}}>✕</Btn>
+                        <Btn size="sm" variant="danger" onClick={async () => {
+                          const ok = await handlers.confirm("¿Seguro que querés eliminar este plan de producción?");
+                          if (ok) handlers.delPlan(p.id);
+                        }}>✕</Btn>
                       </div>
                     </TD>
                   </tr>);
@@ -649,7 +661,10 @@ function Produccion({ data, catalogoMap, handlers, setModal }) {
                 <Badge text={`${p.cantidad} uds`} color="lime"/>
               </div>
               {p.notas&&<div style={{fontSize:12,color:C.muted,fontStyle:"italic",marginBottom:8}}>{p.notas}</div>}
-              <Btn size="sm" variant="danger" onClick={()=>{if(window.confirm("¿Eliminar?"))handlers.delProduccion(p.id);}}>✕ Eliminar</Btn>
+              <Btn size="sm" variant="danger" onClick={async () => {
+                const ok = await handlers.confirm("¿Seguro que querés eliminar este lote?");
+                if (ok) handlers.delProduccion(p.id);
+              }}>✕ Eliminar</Btn>
             </MCard>);})}
             {filtered.length===0&&<Empty icon="◎" text="No hay lotes registrados"/>}
           </div>
@@ -662,8 +677,11 @@ function Produccion({ data, catalogoMap, handlers, setModal }) {
                 <TD><Badge text={`${p.cantidad} uds`} color="lime"/></TD>
                 <TD color={C.muted}>{p.operador}</TD>
                 <TD color={C.muted} style={{maxWidth:200,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.notas||"—"}</TD>
-                <TD><Btn size="sm" variant="danger" onClick={()=>{if(window.confirm("¿Eliminar?"))handlers.delProduccion(p.id);}}>✕</Btn></TD>
-              </tr>);})}
+                <TD><Btn size="sm" variant="danger" onClick={async () => {
+                  const ok = await handlers.confirm("¿Seguro que querés eliminar este lote?");
+                  if (ok) handlers.delProduccion(p.id);
+                }}>✕</Btn></TD>              
+                </tr>);})}
               </tbody>
             </table>
             {filtered.length===0&&<Empty icon="◎" text="No hay lotes registrados"/>}
@@ -903,14 +921,16 @@ export default function App() {
     if (!authed) return;
     (async () => {
       try {
-        const [resMat, resRec] = await Promise.all([
+        const [resMat, resRec, resPla] = await Promise.all([
           api.getMateriales(),
           api.getRecetas(),
+          api.getPlanes(),
         ]);
         setData({
           ...DEMO,
           materias: resMat.ok ? resMat.data : [],
           catalogo: resRec.ok ? resRec.data : [],
+          planes:   resPla.ok ? resPla.data : [],
         });
       } catch (e) {
         console.error("Error cargando datos:", e);
@@ -961,7 +981,7 @@ export default function App() {
   const lowStock = data.materias.filter(m=>m.stockMin>0&&m.stock<=m.stockMin);
 
   const H = {
-    // ── MATERIALES ──────────────────────────────────────────────────────────────
+    // ── MATERIALES ───────────────────────────────────────────────────────────────
     saveMateria: async (m) => {
       ui.loading("Guardando material...");
       try {
@@ -1000,7 +1020,7 @@ export default function App() {
       }
     },
   
-    // ── RECETAS ─────────────────────────────────────────────────────────────────
+    // ── RECETAS ──────────────────────────────────────────────────────────────────
     saveCatalogoLocal: (nuevas) => {
       setData(prev => ({ ...prev, catalogo: nuevas }));
     },
@@ -1023,35 +1043,112 @@ export default function App() {
       }
     },
   
-    // ── PLANES / PRODUCCION / COMPRAS (siguen con save local por ahora) ─────────
-    saveRecetaLegacy: r => save({...data, recetas: data.recetas.find(x=>x.id===r.id) ? data.recetas.map(x=>x.id===r.id?r:x) : [...data.recetas,r]}),
-    delReceta: id => save({...data, recetas: data.recetas.filter(r=>r.id!==id)}),
-    savePlan: p => save({...data, planes: data.planes.find(x=>x.id===p.id) ? data.planes.map(x=>x.id===p.id?p:x) : [...data.planes,p]}),
-    addPlanesFromCSV: planes => save({...data, planes: [...data.planes,...planes]}),
-    delPlan: id => save({...data, planes: data.planes.filter(p=>p.id!==id)}),
-    updatePlanEstado: (id, estado, extra) => {
-      const planes = data.planes.map(p => p.id===id ? {...p, estado, ...extra} : p);
-      if (estado === "producido") {
-        const plan = data.planes.find(p => p.id===id);
-        const entry = {id:genId(), recetaId:plan.recetaId, fecha:extra.fecha||todayStr(), cantidad:extra.totalProducido||plan.cantidad, operador:extra.operador||"—", notas:extra.notas||"Orden completada"};
-        save({...data, planes, produccion:[entry,...data.produccion]});
-      } else {
-        save({...data, planes});
+    // ── PLANES ───────────────────────────────────────────────────────────────────
+    savePlan: async (plan) => {
+      ui.loading("Guardando orden...");
+      try {
+        const res = await api.savePlan(plan);
+        if (res.ok) {
+          setData(prev => ({
+            ...prev,
+            planes: prev.planes.find(x => x.id === plan.id)
+              ? prev.planes.map(x => x.id === plan.id ? plan : x)
+              : [...prev.planes, plan]
+          }));
+          ui.success("Orden guardada correctamente");
+        } else {
+          ui.error("No se pudo guardar la orden", res.error || "Error desconocido");
+        }
+      } catch (e) {
+        ui.error("Error de conexión al guardar orden", e.message);
       }
     },
+    delPlan: async (id) => {
+      ui.loading("Eliminando orden...");
+      try {
+        const res = await api.deletePlan(id);
+        if (res.ok) {
+          setData(prev => ({
+            ...prev,
+            planes: prev.planes.filter(p => p.id !== id)
+          }));
+          ui.success("Orden eliminada");
+        } else {
+          ui.error("No se pudo eliminar la orden", res.error || "Error desconocido");
+        }
+      } catch (e) {
+        ui.error("Error de conexión al eliminar orden", e.message);
+      }
+    },  
+    updatePlanEstado: async (id, estado, extra) => {
+      const plan = data.planes.find(p => p.id === id);
+      const planActualizado = { ...plan, estado, ...extra };
+      ui.loading("Actualizando estado...");
+      try {
+        const res = await api.savePlan(planActualizado);
+        if (res.ok) {
+          setData(prev => ({
+            ...prev,
+            planes: prev.planes.map(p => p.id === id ? planActualizado : p),
+            ...(estado === "producido" ? {
+              produccion: [{
+                id: genId(),
+                recetaId: plan.recetaId,
+                fecha: extra.fecha || todayStr(),
+                cantidad: extra.totalProducido || plan.cantidad,
+                operador: extra.operador || "—",
+                notas: extra.notas || "Orden completada"
+              }, ...prev.produccion]
+            } : {})
+          }));
+          ui.success("Estado actualizado");
+        } else {
+          ui.error("No se pudo actualizar el estado", res.error);
+        }
+      } catch (e) {
+        ui.error("Error de conexión", e.message);
+      }
+    },
+  
+    addPlanesFromCSV: async (planes) => {
+      ui.loading("Importando planes...");
+      try {
+        const res = await api.savePlanes(planes);
+        if (res.ok) {
+          setData(prev => ({
+            ...prev,
+            planes: [...prev.planes, ...planes]
+          }));
+          ui.success(`${planes.length} órdenes importadas correctamente`);
+        } else {
+          ui.error("No se pudo importar el CSV", res.error);
+        }
+      } catch (e) {
+        ui.error("Error de conexión al importar", e.message);
+      }
+    },
+  
+    // ── PRODUCCION (todavía en memoria) ──────────────────────────────────────────
     saveProduccion: p => {
-      save({...data, produccion:[{...p, id:genId()},...data.produccion]});
+      save({...data, produccion: [{...p, id: genId()}, ...data.produccion]});
     },
-    delProduccion: id => save({...data, produccion: data.produccion.filter(p=>p.id!==id)}),
-    toggleCompra: id => save({...data, compras: data.compras.map(c=>c.id===id?{...c,completado:!c.completado}:c)}),
-    delCompra: id => save({...data, compras: data.compras.filter(c=>c.id!==id)}),
-    addCompraManual: item => save({...data, compras:[...data.compras,{...item,id:genId(),tipo:"manual",completado:false}]}),
+    delProduccion: id => save({...data, produccion: data.produccion.filter(p => p.id !== id)}),
+  
+    // ── COMPRAS (todavía en memoria) ──────────────────────────────────────────────
+    toggleCompra: id => save({...data, compras: data.compras.map(c => c.id === id ? {...c, completado: !c.completado} : c)}),
+    delCompra: id => save({...data, compras: data.compras.filter(c => c.id !== id)}),
+    addCompraManual: item => save({...data, compras: [...data.compras, {...item, id: genId(), tipo: "manual", completado: false}]}),
     generateCompras: () => {
-      const ex = new Set(data.compras.filter(c=>c.tipo==="auto"&&!c.completado).map(c=>c.materiaId));
-      const nuevas = lowStock.filter(m=>!ex.has(m.id)).map(m=>({id:genId(),tipo:"auto",materiaId:m.id,cantSugerida:Math.max(m.stockMin*2-m.stock,m.stockMin),completado:false,nota:""}));
-      if (nuevas.length===0) { window.alert("No hay nuevos ítems para agregar."); return; }
-      save({...data, compras:[...data.compras,...nuevas]});
+      const ex = new Set(data.compras.filter(c => c.tipo === "auto" && !c.completado).map(c => c.materiaId));
+      const nuevas = lowStock.filter(m => !ex.has(m.id)).map(m => ({
+        id: genId(), tipo: "auto", materiaId: m.id,
+        cantSugerida: Math.max(m.stockMin * 2 - m.stock, m.stockMin),
+        completado: false, nota: ""
+      }));
+      if (nuevas.length === 0) { window.alert("No hay nuevos ítems para agregar."); return; }
+      save({...data, compras: [...data.compras, ...nuevas]});
     },
+    confirm: ui.confirm,
   };
 
   const sp = {data,materiasMap:mMap,recetasMap:rMap,catalogoMap:cMap,stockValue,lowStock,handlers:H,setModal,setSection:(s)=>{setSec(s);setDrawerOpen(false);}};

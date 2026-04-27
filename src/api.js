@@ -45,10 +45,14 @@ export const api = {
     }
     return res;
   },
-  saveMaterial:     (m)   => get("saveMaterial",     { data: JSON.stringify(m) }),
-  deleteMateriales: (ids) => get("deleteMateriales", { ids:  JSON.stringify(ids) }),
-
+  saveMaterial: (m) => get("saveMaterial", { data: JSON.stringify(m) }),
+  deleteMateriales: (ids) => get("deleteMateriales", { ids: JSON.stringify(ids) }),
   // Catálogo
   getRecetas: () => get("getRecetas"),
-  saveReceta:   (receta) => post("saveReceta", { data: JSON.stringify(receta) }),
+  saveReceta: (receta) => post("saveReceta", { data: JSON.stringify(receta) }),
+  // Planes
+  getPlanes: () => get("getPlanes"),
+  savePlan: (plan) => post("savePlan", { data: JSON.stringify(plan) }),
+  deletePlan: (id) => post("deletePlan", { id }),
+  savePlanes: (planes) => post("savePlanes", { data: JSON.stringify(planes) }),
 };

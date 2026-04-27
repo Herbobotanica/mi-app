@@ -120,39 +120,93 @@ export function ErrorModal({ message, detail, onClose }) {
   );
 }
 
+// ─── ConfirmModal ─────────────────────────────────────────────────────────────
+export function ConfirmModal({ message, onConfirm, onCancel }) {
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 9999,
+      background: "rgba(0,0,0,0.5)",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      padding: 24, fontFamily: "system-ui,-apple-system,sans-serif",
+    }}>
+      <div style={{
+        background: "#f7f5ee", borderRadius: 16, width: "100%", maxWidth: 380,
+        boxShadow: "0 8px 40px rgba(0,0,0,0.2)",
+        border: "1.5px solid #cbc8b5",
+      }}>
+        <div style={{
+          padding: "20px 20px 16px",
+          display: "flex", alignItems: "center", gap: 12,
+        }}>
+          <div style={{
+            width: 36, height: 36, borderRadius: "50%",
+            background: "#faf0ee", display: "flex",
+            alignItems: "center", justifyContent: "center",
+            fontSize: 18, flexShrink: 0,
+          }}>🗑</div>
+          <p style={{ margin: 0, fontSize: 14, color: "#2c2c20", fontWeight: 500 }}>
+            {message}
+          </p>
+        </div>
+        <div style={{
+          padding: "0 20px 20px",
+          display: "flex", justifyContent: "flex-end", gap: 8,
+        }}>
+          <button onClick={onCancel} style={{
+            background: "transparent", color: "#5c5c48",
+            border: "1.5px solid #cbc8b5", borderRadius: 8,
+            padding: "9px 18px", cursor: "pointer",
+            fontFamily: "inherit", fontSize: 14, fontWeight: 600,
+          }}>
+            Cancelar
+          </button>
+          <button onClick={onConfirm} style={{
+            background: "#9e2010", color: "#fff", border: "none",
+            borderRadius: 8, padding: "9px 18px", cursor: "pointer",
+            fontFamily: "inherit", fontSize: 14, fontWeight: 600,
+          }}>
+            Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Hook useUI ───────────────────────────────────────────────────────────────
 export function useUI() {
-  const [loader, setLoader]     = useState(false);
+  const [loader, setLoader]       = useState(false);
   const [loaderMsg, setLoaderMsg] = useState("Guardando...");
-  const [toast, setToast]       = useState(null);
-  const [error, setError]       = useState(null);
+  const [toast, setToast]         = useState(null);
+  const [error, setError]         = useState(null);
+  const [confirm, setConfirm]     = useState(null); // { message, onConfirm }
 
   const ui = {
-    loading: (msg = "Guardando...") => {
-      setLoaderMsg(msg);
-      setLoader(true);
-    },
+    loading: (msg = "Guardando...") => { setLoaderMsg(msg); setLoader(true); },
     success: (msg = "Guardado correctamente") => {
       setLoader(false);
       setToast(msg);
       setTimeout(() => setToast(null), 4000);
     },
-    error: (msg, detail = null) => {
-      setLoader(false);
-      setError({ msg, detail });
-    },
-    clear: () => {
-      setLoader(false);
-      setToast(null);
-      setError(null);
-    },
+    error: (msg, detail = null) => { setLoader(false); setError({ msg, detail }); },
+    clear: () => { setLoader(false); setToast(null); setError(null); setConfirm(null); },
+
+    // Nuevo — muestra modal de confirmación y devuelve una Promise
+    confirm: (message) => new Promise((resolve) => {
+      setConfirm({
+        message,
+        onConfirm: () => { setConfirm(null); resolve(true); },
+        onCancel:  () => { setConfirm(null); resolve(false); },
+      });
+    }),
   };
 
   const UIComponents = () => (
     <>
-      {loader && <Loader message={loaderMsg} />}
-      {toast  && <Toast message={toast} onHide={() => setToast(null)} />}
-      {error  && <ErrorModal message={error.msg} detail={error.detail} onClose={() => setError(null)} />}
+      {loader  && <Loader message={loaderMsg} />}
+      {toast   && <Toast message={toast} onHide={() => setToast(null)} />}
+      {error   && <ErrorModal message={error.msg} detail={error.detail} onClose={() => setError(null)} />}
+      {confirm && <ConfirmModal message={confirm.message} onConfirm={confirm.onConfirm} onCancel={confirm.onCancel} />}
     </>
   );
 
