@@ -511,6 +511,12 @@ function RecetasCatalogo({ data, handlers }) {
 function PlanProduccion({ data, handlers, setModal }) {
   const isMobile = useMobile();
   const [filtroEstado,setFiltroEstado] = useState("activos");
+  const [refreshing, setRefreshing] = useState(false);
+    const handleRefresh = async () => {
+    setRefreshing(true);
+    await handlers.refreshPlanes();
+    setRefreshing(false);
+  };
   const cMap = Object.fromEntries((data.catalogo||[]).map(r=>[r.id,r]));
   const getNombre = id => cMap[id]?.nombre||"Producto eliminado";
   const filtered = data.planes.filter(p=>{ if(filtroEstado==="activos")return p.estado!=="producido"; if(filtroEstado==="producido")return p.estado==="producido"; return true; }).sort((a,b)=>a.fechaEntrega.localeCompare(b.fechaEntrega));
@@ -518,7 +524,9 @@ function PlanProduccion({ data, handlers, setModal }) {
   return (
     <div style={{flex:1,overflow:"auto",display:"flex",flexDirection:"column"}}>
       <PH title="Plan de Producción" sub={`${data.planes.filter(p=>p.estado!=="producido").length} órdenes activas`}
-        action={<div style={{display:"flex",gap:8}}><Btn variant="ghost" size="sm" onClick={()=>setModal({type:"csvPlan"})}>⬆ CSV</Btn><Btn onClick={()=>setModal({type:"plan",data:null})}>+ Nueva orden</Btn></div>}/>
+        action={<div style={{display:"flex",gap:8}}><Btn variant="ghost" size="sm" onClick={handleRefresh} disabled={refreshing}>
+        {refreshing ? "↻ Actualizando..." : "↻ Actualizar"}
+      </Btn><Btn variant="ghost" size="sm" onClick={()=>setModal({type:"csvPlan"})}>⬆ CSV</Btn><Btn onClick={()=>setModal({type:"plan",data:null})}>+ Nueva orden</Btn></div>}/>
       <div style={{padding:"12px 16px 8px",display:"flex",gap:6,flexWrap:"wrap"}}>
         {[["activos","Activas"],["producido","Producidas"],["todos","Todas"]].map(([v,l])=>(
           <button key={v} onClick={()=>setFiltroEstado(v)} style={{padding:"6px 14px",border:`1.5px solid ${C.border}`,borderRadius:20,cursor:"pointer",fontFamily:"inherit",fontSize:13,background:filtroEstado===v?C.primary:C.surface,color:filtroEstado===v?"#fff":C.muted,fontWeight:filtroEstado===v?700:400}}>{l}</button>
@@ -1125,6 +1133,16 @@ export default function App() {
         }
       } catch (e) {
         ui.error("Error de conexión al importar", e.message);
+      }
+    },
+    refreshPlanes: async () => {
+      try {
+        const res = await api.getPlanes();
+        if (res.ok) {
+          setData(prev => ({ ...prev, planes: res.data }));
+        }
+      } catch (e) {
+        ui.error("Error al actualizar planes", e.message);
       }
     },
   
